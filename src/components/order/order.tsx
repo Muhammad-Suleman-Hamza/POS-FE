@@ -1,5 +1,5 @@
 function Order() {
-    return <></>;
+    return <>Order</>;
 }
 
 export default Order;

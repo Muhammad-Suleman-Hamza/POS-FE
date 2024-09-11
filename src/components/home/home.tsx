@@ -1,5 +1,5 @@
-function Item() {
-    return <></>;
+function Home() {
+    return <>Home</>;
 }
 
-export default Item;
+export default Home;

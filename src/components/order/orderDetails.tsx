@@ -1,5 +1,5 @@
 function OrderDetails() {
-    return <></>;
+    return <>OrderDetails</>;
 }
 
 export default OrderDetails;

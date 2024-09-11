@@ -1,5 +1,5 @@
 function ItemDetails() {
-    return <></>;
+    return <>ItemDetails</>;
 }
 
 export default ItemDetails;
