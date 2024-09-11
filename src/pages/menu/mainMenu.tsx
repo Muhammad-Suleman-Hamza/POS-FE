@@ -14,7 +14,21 @@ import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
-const settings = ['Profile', 'Configurations', 'Logout'];
+const settings = [
+  {
+    name: 'Profile',
+    link: 'profile'
+  },
+  {
+    name: 'Configurations',
+    link: 'configurations'
+  },
+  {
+    name: 'Logout',
+    link: 'logout'
+  }
+];
+
 const pages = [
   {
     name: 'Home',
@@ -135,8 +149,8 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
+                  <Link to={setting.link} className='setting-links'><Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography></Link>
                 </MenuItem>
               ))}
             </Menu>

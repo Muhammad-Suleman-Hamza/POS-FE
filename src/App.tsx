@@ -1,16 +1,16 @@
-import Item from './components/item/item';
-import Home from './components/home/home';
-import Order from './components/order/order';
-import Vendor from './components/vendor/vendor';
-import Report from './components/report/report';
-import MainMenu from './components/menu/mainMenu';
-import Customer from './components/customer/customer';
-import ItemDetails from './components/item/itemDetails';
-import OrderDetails from './components/order/orderDetails';
-import VendorDetails from './components/vendor/vendorDetails';
-import ReportDetails from './components/report/reportDetails';
+import Item from './pages/item/item';
+import Home from './pages/home/home';
+import Order from './pages/order/order';
+import Vendor from './pages/vendor/vendor';
+import Report from './pages/report/report';
+import MainMenu from './pages/menu/mainMenu';
+import Customer from './pages/customer/customer';
+import ItemDetails from './pages/item/itemDetails';
+import OrderDetails from './pages/order/orderDetails';
+import VendorDetails from './pages/vendor/vendorDetails';
+import ReportDetails from './pages/report/reportDetails';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import CustomerDetails from './components/customer/customerDetails';
+import CustomerDetails from './pages/customer/customerDetails';
 
 const App: React.FC = () => (
   <BrowserRouter>
