@@ -1,4 +1,5 @@
 import { Order } from "./types";
+import { GridColDef } from '@mui/x-data-grid';
 
 export interface Data {
     id: number;
@@ -9,17 +10,14 @@ export interface Data {
     protein: number;
 }
 
-export interface HeadCell {
-    disablePadding: boolean;
-    id: keyof Data;
-    label: string;
-    numeric: boolean;
+export interface tableHeading {
+    key: string,
+    value: string
 }
 
-export interface EnhancedTableProps {
-    items: any // update this when props decided
-    tableName: string;
-    headings: string[];
+export interface TableProps {
+    rows: any // update this when props decided
+    headings: tableHeading[];
 }
 
 export interface EnhancedTableHeadProps {
