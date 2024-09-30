@@ -1,7 +1,11 @@
-# POS - FE (React + TypeScript + Vite)
+# React + Mui Dashboard
 
-## Installation
-npm i
 
-## Start
-npm run start
+## Acknowledgements
+ - [Build a COMPLETE React Admin Dashboard App](https://youtu.be/wYpCWwD1oz)
+
+## Demo
+
+https://reactmuidashboard.netlify.app
+
+
