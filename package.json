@@ -1,35 +1,64 @@
 {
-  "name": "pos",
+  "name": "react_dashboard",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port 3000",
-    "start": "vite --port 3000",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mui/material": "^6.0.1",
-    "@reduxjs/toolkit": "^2.2.7",
-    "axios": "^1.7.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@emotion/react": "11.10.5",
+    "@emotion/styled": "11.10.5",
+    "@fullcalendar/core": "5.11.3",
+    "@fullcalendar/daygrid": "5.11.3",
+    "@fullcalendar/interaction": "^5.11.3",
+    "@fullcalendar/list": "5.11.3",
+    "@fullcalendar/react": "^5.11.2",
+    "@fullcalendar/timegrid": "5.11.3",
+    "@mui/icons-material": "5.10.9",
+    "@mui/material": "5.10.13",
+    "@mui/x-data-grid": "5.17.10",
+    "@nivo/bar": "0.80.0",
+    "@nivo/core": "0.80.0",
+    "@nivo/geo": "0.80.0",
+    "@nivo/line": "0.80.0",
+    "@nivo/pie": "0.80.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "formik": "^2.2.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-pro-sidebar": "1.0.0-alpha.7",
+    "react-router-dom": "6.4.3",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4",
+    "yup": "0.32.11"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "eslint": "^9.9.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.9",
-    "globals": "^15.9.0",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "@vitejs/plugin-react": "^4.3.2",
+    "vite": "^5.4.8",
+    "vite-plugin-commonjs": "^0.10.3",
+    "vite-plugin-svgr": "^4.2.0",
+    "vite-tsconfig-paths": "^5.0.1"
   }
 }
