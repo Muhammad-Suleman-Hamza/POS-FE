@@ -1,5 +1,5 @@
 import Item from "./pages/item";
-import Order from "./pages/oOrder";
+import Order from "./pages/order";
 import Vendor from "./pages/vendor";
 import Customer from "./pages/customer";
 import Dashboard from "./pages/dashboard";
