@@ -1,7 +1,7 @@
 import Item from "./pages/item";
-import Order from "./pages/Order";
-import Customer from "./pages/Customer";
-import Vendor from "./pages/Vendor";
+import Order from "./pages/oOrder";
+import Vendor from "./pages/vendor";
+import Customer from "./pages/customer";
 import Dashboard from "./pages/dashboard";
 import Topbar from "./pages/global/Topbar";
 import { Routes, Route } from "react-router-dom";
