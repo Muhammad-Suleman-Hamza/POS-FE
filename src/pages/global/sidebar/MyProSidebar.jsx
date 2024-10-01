@@ -5,24 +5,11 @@ import { useProSidebar } from "react-pro-sidebar";
 import { pages } from '../../../constants/constants'
 import { useSidebarContext } from "./sidebarContext";
 import { Menu, Sidebar, MenuItem } from "react-pro-sidebar";
-import { useTheme, Box, Typography, IconButton } from "@mui/material";
-
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import { useTheme, Box, Typography, IconButton } from "@mui/material";
 import SwitchLeftOutlinedIcon from "@mui/icons-material/SwitchLeftOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import SwitchRightOutlinedIcon from "@mui/icons-material/SwitchRightOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -114,7 +101,7 @@ const MyProSidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  Dashboard
                 </Typography>
                 <IconButton
                   onClick={
@@ -126,39 +113,6 @@ const MyProSidebar = () => {
               </Box>
             )}
           </MenuItem>
-          {!collapsed && (
-            <Box mb="25px">
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  "& .avater-image": {
-                    backgroundColor: colors.primary[500],
-                  },
-                }}
-              > 
-                <img
-                  className="avater-image"
-                  alt="profile user"
-                  width="100px"
-                  height="100px"
-                  src={"../../assets/user.png"}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
-              <Box textAlign="center">
-                <Typography
-                  variant="h3"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
-                >
-                  Harun Jeylan
-                </Typography>
-              </Box>
-            </Box>
-          )}
           <Box paddingLeft={collapsed ? undefined : "10%"}>
             <Typography
               variant="h6"
