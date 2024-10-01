@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   IconButton,
   Typography,
   useTheme,
@@ -14,12 +13,9 @@ import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
-import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import ProgressCircle from "../../components/ProgressCircle";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -29,15 +25,13 @@ const Dashboard = () => {
     <Box m="20px">
       {/* HEADER */}
 
-      <Box
+      {/* <Box
         display={smScreen ? "flex" : "block"}
         flexDirection={smScreen ? "row" : "column"}
         justifyContent={smScreen ? "space-between" : "start"}
         alignItems={smScreen ? "center" : "start"}
         m="10px 0"
       >
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-
         <Box>
           <Button
             sx={{
@@ -52,7 +46,7 @@ const Dashboard = () => {
             Download Reports
           </Button>
         </Box>
-      </Box>
+      </Box> */}
 
       {/* GRID & CHARTS */}
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -175,45 +169,13 @@ const Dashboard = () => {
                     $58,373,698
                   </Typography>
                 </Box>
-                <Box>
-                  <IconButton>
-                    <DownloadOutlinedIcon
-                      sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                    />
-                  </IconButton>
-                </Box>
               </Box>
               <Box height="250px" m="-20px 0 0 0">
                 <LineChart isDashboard={true} />
               </Box>
             </Box>
           </Grid>
-          <Grid xs={12} sm={12} md={6}>
-            <Box backgroundColor={colors.primary[400]} p="30px">
-              <Typography variant="h5" fontWeight="600">
-                Campaign
-              </Typography>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                mt="25px"
-              >
-                <ProgressCircle size="125" />
-                <Typography
-                  variant="h5"
-                  color={colors.greenAccent[500]}
-                  sx={{ mt: "15px" }}
-                >
-                  $48,352 revenue generated
-                </Typography>
-                <Typography>
-                  Includes extra misc expenditures and costs
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid xs={12} sm={12} md={6}>
+          <Grid xs={12} sm={12} md={12}>
             <Box backgroundColor={colors.primary[400]}>
               <Typography
                 variant="h5"
@@ -224,20 +186,6 @@ const Dashboard = () => {
               </Typography>
               <Box height="250px" mt="-20px">
                 <BarChart isDashboard={true} />
-              </Box>
-            </Box>
-          </Grid>
-          <Grid xs={12}>
-            <Box backgroundColor={colors.primary[400]} padding="30px">
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                sx={{ marginBottom: "15px" }}
-              >
-                Geography Based Traffic
-              </Typography>
-              <Box height="200px">
-                <GeographyChart isDashboard={true} />
               </Box>
             </Box>
           </Grid>
@@ -262,7 +210,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Resent Transaction
+                Resent Orders
               </Typography>
             </Box>
             {mockTransactions.map((transaction, i) => {
