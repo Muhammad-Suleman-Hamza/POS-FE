@@ -1,4 +1,4 @@
-# POS - FE (React + TypeScript + Vite)
+# POS - FE (React + Vite)
 
 ## Installation
 npm i
