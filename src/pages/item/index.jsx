@@ -1,19 +1,34 @@
 import React from "react";
+import Form from "../form";
 import { tokens } from "../../theme";
+import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import { mockItems } from "../../data/mockData";
-import { itemColumns } from "../../constants/constants";
+import BasicModal from '../../components/Modal';
+import { itemColumns } from "../../constants/tableColumns";
+import {
+  addbuttonOfItem,
+  inputsFieldsOfItem,
+  initialValuesOfItem,
+  checkoutSchemaOfItem
+} from '../../constants/FormFields'
 
 const Item = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Items" subtitle="" />
+        <Button {...addbuttonOfItem} onClick={handleOpen}>Add Item</Button>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -45,6 +60,15 @@ const Item = () => {
         }}
       >
         <DataGrid rows={mockItems} columns={itemColumns} />
+
+        <BasicModal open={open} handleClose={handleClose}>
+          <Form title={"Create Item"} subtitle=""
+            button={addbuttonOfItem}
+            inputsFields={inputsFieldsOfItem}
+            initialValues={initialValuesOfItem}
+            checkoutSchema={checkoutSchemaOfItem}
+          />
+        </BasicModal>
       </Box>
     </Box>
   );

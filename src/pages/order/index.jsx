@@ -4,7 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import { mockOrders } from "../../data/mockData";
-import { orderColumns } from "../../constants/constants";
+import { orderColumns } from "../../constants/tableColumns";
 
 const Order = () => {
   const theme = useTheme();
