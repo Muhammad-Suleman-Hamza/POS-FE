@@ -1,4 +1,5 @@
-
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -17,17 +18,17 @@ export const pages = {
         {
             "title": "Items",
             "route": "items",
-            "icon": <HomeOutlinedIcon />
+            "icon": <ReceiptOutlinedIcon />
         },
         {
             "title": "Orders",
             "route": "orders",
-            "icon": <ReceiptOutlinedIcon />
+            "icon": <PointOfSaleIcon />
         },
         {
             "title": "Customers",
             "route": "customers",
-            "icon": <PeopleOutlinedIcon />
+            "icon": <PersonAddIcon />
         },
         {
             "title": "Vendors",
