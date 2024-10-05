@@ -3,11 +3,11 @@ import { tokens } from "../theme";
 export const mockItems = [
   {
     id: 1,
-    name: "Jon Snow",
-    price: "jonsnow@gmail.com",
     weight: 35,
-    dimensions: "(665)121-5454",
-    measuringUnit: "admin"
+    name: "Jon Snow",
+    measuringUnit: "admin",
+    price: "jonsnow@gmail.com",
+    dimensions: "(665)121-5454"
   },
   {
     id: 2,

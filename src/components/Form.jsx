@@ -1,6 +1,6 @@
 import React from 'react'
+import Header from "./Header";
 import { Formik } from "formik";
-import Header from "../../components/Header";
 import { useMediaQuery } from "@mui/material";
 import { Box, Button, TextField } from '@mui/material'
 
