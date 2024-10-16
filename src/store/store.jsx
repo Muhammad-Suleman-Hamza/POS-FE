@@ -1,5 +1,6 @@
 import itemReducer from './slices/item'
 import orderReducer from './slices/order'
+import loginReducer from './slices/login'
 import commonReducer from './slices/common'
 import vendorReducer from './slices/vendor'
 import customerReducer from './slices/customer'
@@ -9,6 +10,7 @@ export const store = configureStore({
   reducer: {
     item: itemReducer,
     order: orderReducer,
+    login: loginReducer,
     common: commonReducer,
     vendor: vendorReducer,
     customer: customerReducer,

@@ -1,4 +1,5 @@
 import Item from "./pages/item";
+import Login from "./pages/login";
 import Order from "./pages/order";
 import Vendor from "./pages/vendor";
 import Customer from "./pages/customer";
@@ -22,6 +23,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/items" element={<Item />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/orders" element={<Order />} />
                 <Route path="/vendors" element={<Vendor />} />
                 <Route path="/customers" element={<Customer />} />
