@@ -11,7 +11,7 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 export const pages = {
     "mainMenu": [
         {
-            "route": "",
+            "route": "dashboard",
             "title": "Home",
             "icon": <HomeOutlinedIcon />
         },
@@ -59,5 +59,28 @@ export const pages = {
         }
     ]
 }
+
+export const paymentMethods = [
+    {
+        pk: "COD",
+        name: "Cash on Delivery",
+    },
+    {
+        pk: "CashCheque",
+        name: "Cash Cheque",
+    },
+    {
+        pk: "CrossCheque",
+        name: "Cross Cheque",
+    },
+    {
+        pk: "Installments",
+        name: "Installments",
+    },
+    {
+        pk: "Others",
+        name: "Others",
+    },
+]
 
 export const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;

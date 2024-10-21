@@ -6,13 +6,12 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
-import { useDispatch,useSelector } from "react-redux";
-import { editButton } from '../../constants/FormFields';
-import { orderToBeDeleted } from "../../store/slices/order";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteOrder, getOrders } from "../../store/slices/order";
+import { editButton, getOrderColumns, getOrderFormFields } from '../../constants/FormFields';
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
-  orderFormColumns,
   initialValuesOfOrder,
   checkoutSchemaOfOrder
 } from '../../constants/FormFields'
@@ -22,24 +21,21 @@ const Order = () => {
   const dispatch = useDispatch();
   const colors = tokens(theme.palette.mode);
 
+  const { items } = useSelector((state) => state.item);
   const { orders } = useSelector((state) => state.order);
+  const { customers } = useSelector((state) => state.customer);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
-  
-  const orderColumns = [
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'price', headerName: 'Price', width: 200 },
-    { field: 'weight', headerName: 'Weight', width: 200 },
-    { field: 'customer', headerName: 'Customer', width: 200 },
-    { field: 'paymentMethod', headerName: 'Payment method', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
-        <Box>
-            <Button {...editButton} onClick={()=> dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-            <Button {...editButton} onClick={()=> dispatch(orderToBeDeleted(params.row))}>Delete</Button>
-        </Box>
-    )},
-  ];
+
+  const formColumns = getOrderFormFields(items, customers);
+  const orderColumns = getOrderColumns(
+    (params) => dispatch(saveEntryToBeUpdated(params.row)),
+    async (params) => {
+      const result = await dispatch(deleteOrder(params.row.pk))
+      if (result.payload.status === 200) toast.success("Order is deleted.")
+  });
 
   useEffect(() => {
+    if (orders?.length === 0) dispatch(getOrders())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 
@@ -78,18 +74,19 @@ const Order = () => {
           },
         }}
       >
-        <DataGrid rows={orders} columns={orderColumns} />
+        <DataGrid rows={orders} columns={orderColumns} getRowId={(row) => row.pk} />
 
-        <BasicModal 
+        <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update} 
+          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
         >
-          <Form 
+          <Form
             subtitle=""
-            inputsFields={orderFormColumns}
+            source='order'
+            inputsFields={formColumns}
             checkoutSchema={checkoutSchemaOfOrder}
+            button={showCreateOrUpdateModal.create ? addButton : editButton}
             title={showCreateOrUpdateModal.create ? "Create Order" : "Update Order"}
-            button={showCreateOrUpdateModal.create ? addButton: editButton}
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfOrder : entryToBeUpdateOrDelete}
           />
         </BasicModal>

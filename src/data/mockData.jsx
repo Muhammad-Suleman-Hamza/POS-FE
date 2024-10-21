@@ -152,47 +152,47 @@ export const mockOrders = [
 
 export const mockCustomers = [
   {
-    id: 1,
+    pk: "1",
     name: "Jon Snow",
     number: "(665)121-5454",
   },
   {
-    id: 2,
+    pk: "2",
     name: "Cersei Lannister",
     number: "(421)314-2288",
   },
   {
-    id: 3,
+    pk: "3",
     name: "Jaime Lannister",
     number: "(422)982-6739",
   },
   {
-    id: 4,
+    pk: "4",
     name: "Anya Stark",
     number: "(921)425-6742",
   },
   {
-    id: 5,
+    pk: "5",
     name: "Daenerys Targaryen",
     number: "(421)445-1189",
   },
   {
-    id: 6,
+    pk: "6",
     name: "Ever Melisandre",
     number: "(232)545-6483",
   },
   {
-    id: 7,
+    pk: "7",
     name: "Ferrara Clifford",
     number: "(543)124-0123",
   },
   {
-    id: 8,
+    pk: "8",
     name: "Rossini Frances",
     number: "(222)444-5555",
   },
   {
-    id: 9,
+    pk: "9",
     name: "Harvey Roxie",
     number: "(444)555-6239",
   }

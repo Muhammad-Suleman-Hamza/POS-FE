@@ -75,7 +75,7 @@ const Customer = () => {
           },
         }}
       >
-        <DataGrid rows={customers} columns={customerColumns} />
+        <DataGrid rows={customers} columns={customerColumns} getRowId={(row) => row.pk} />
 
         <BasicModal 
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
