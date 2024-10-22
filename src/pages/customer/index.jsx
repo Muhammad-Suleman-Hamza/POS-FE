@@ -1,13 +1,15 @@
 import { useEffect } from "react";
 import { tokens } from "../../theme";
+import { toast } from 'react-toastify';
 import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { editButton } from '../../constants/FormFields';
+import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
@@ -15,7 +17,6 @@ import {
   initialValuesOfCustomer,
   checkoutSchemaOfCustomer
 } from '../../constants/FormFields'
-import { customerToBeDeleted } from "../../store/slices/customer";
 
 const Customer = () => {
   const theme = useTheme();
@@ -24,19 +25,26 @@ const Customer = () => {
 
   const { customers } = useSelector((state) => state.customer);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
-  
+
   const customerColumns = [
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'number', headerName: 'Number', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
+    { field: 'customerName', headerName: 'Name', width: 200 },
+    { field: 'contact', headerName: 'Contact', width: 200 },
+    { field: 'address', headerName: 'Address', width: 200 },
+    {
+      field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
         <Box>
-            <Button {...editButton} onClick={()=> dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-            <Button {...editButton} onClick={()=> dispatch(customerToBeDeleted(params.row))}>Delete</Button>
+          <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
+          <Button {...editButton} onClick={async () => {
+            const result = await dispatch(deleteCustomer(params.row.pk));
+            if (result.payload.status === 200) toast.warning("Customer is deleted.")
+          }}>Delete</Button>
         </Box>
-    )},
+      )
+    },
   ];
 
   useEffect(() => {
+    if (customers?.length === 0) dispatch(getCustomers())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 
@@ -77,16 +85,17 @@ const Customer = () => {
       >
         <DataGrid rows={customers} columns={customerColumns} getRowId={(row) => row.pk} />
 
-        <BasicModal 
+        <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update} 
+          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
         >
-          <Form 
+          <Form
             subtitle=""
+            source='customer'
             inputsFields={customerFormColumns}
             checkoutSchema={checkoutSchemaOfCustomer}
+            button={showCreateOrUpdateModal.create ? addButton : editButton}
             title={showCreateOrUpdateModal.create ? "Create Customer" : "Update Customer"}
-            button={showCreateOrUpdateModal.create ? addButton: editButton}
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfCustomer : entryToBeUpdateOrDelete}
           />
         </BasicModal>

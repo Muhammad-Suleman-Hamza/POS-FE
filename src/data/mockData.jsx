@@ -154,47 +154,56 @@ export const mockCustomers = [
   {
     pk: "1",
     name: "Jon Snow",
-    number: "(665)121-5454",
+    address: "Jon Snow",
+    contact: "(665)121-5454",
   },
   {
     pk: "2",
+    address: "Jon Snow",
     name: "Cersei Lannister",
-    number: "(421)314-2288",
+    contact: "(421)314-2288",
   },
   {
     pk: "3",
+    address: "Jon Snow",
     name: "Jaime Lannister",
-    number: "(422)982-6739",
+    contact: "(422)982-6739",
   },
   {
     pk: "4",
+    address: "Jon Snow",
     name: "Anya Stark",
-    number: "(921)425-6742",
+    contact: "(921)425-6742",
   },
   {
     pk: "5",
+    address: "Jon Snow",
     name: "Daenerys Targaryen",
-    number: "(421)445-1189",
+    contact: "(421)445-1189",
   },
   {
     pk: "6",
+    address: "Jon Snow",
     name: "Ever Melisandre",
-    number: "(232)545-6483",
+    contact: "(232)545-6483",
   },
   {
     pk: "7",
+    address: "Jon Snow",
     name: "Ferrara Clifford",
-    number: "(543)124-0123",
+    contact: "(543)124-0123",
   },
   {
     pk: "8",
+    address: "Jon Snow",
     name: "Rossini Frances",
-    number: "(222)444-5555",
+    contact: "(222)444-5555",
   },
   {
     pk: "9",
+    address: "Jon Snow",
     name: "Harvey Roxie",
-    number: "(444)555-6239",
+    contact: "(444)555-6239",
   }
 ];
 
@@ -202,7 +211,7 @@ export const mockVendors = [
   {
     id: 1,
     name: "Jon Snow",
-    number: "jonsnow@gmail.com",
+    contact: "jonsnow@gmail.com",
     comapny: 35,
     location: "(665)121-5454",
     products: "admin"
@@ -210,7 +219,7 @@ export const mockVendors = [
   {
     id: 2,
     name: "Cersei Lannister",
-    number: "cerseilannister@gmail.com",
+    contact: "cerseilannister@gmail.com",
     comapny: 42,
     location: "(421)314-2288",
     products: "mancomapnyr"
@@ -218,7 +227,7 @@ export const mockVendors = [
   {
     id: 3,
     name: "Jaime Lannister",
-    number: "jaimelannister@gmail.com",
+    contact: "jaimelannister@gmail.com",
     comapny: 45,
     location: "(422)982-6739",
     products: "user"
@@ -226,7 +235,7 @@ export const mockVendors = [
   {
     id: 4,
     name: "Anya Stark",
-    number: "anyastark@gmail.com",
+    contact: "anyastark@gmail.com",
     comapny: 16,
     location: "(921)425-6742",
     products: "admin"
@@ -234,7 +243,7 @@ export const mockVendors = [
   {
     id: 5,
     name: "Daenerys Targaryen",
-    number: "daenerystargaryen@gmail.com",
+    contact: "daenerystargaryen@gmail.com",
     comapny: 31,
     location: "(421)445-1189",
     products: "user"
@@ -242,7 +251,7 @@ export const mockVendors = [
   {
     id: 6,
     name: "Ever Melisandre",
-    number: "evermelisandre@gmail.com",
+    contact: "evermelisandre@gmail.com",
     comapny: 150,
     location: "(232)545-6483",
     products: "mancomapnyr"
@@ -250,7 +259,7 @@ export const mockVendors = [
   {
     id: 7,
     name: "Ferrara Clifford",
-    number: "ferraraclifford@gmail.com",
+    contact: "ferraraclifford@gmail.com",
     comapny: 44,
     location: "(543)124-0123",
     products: "user"
@@ -258,7 +267,7 @@ export const mockVendors = [
   {
     id: 8,
     name: "Rossini Frances",
-    number: "rossinifrances@gmail.com",
+    contact: "rossinifrances@gmail.com",
     comapny: 36,
     location: "(222)444-5555",
     products: "user"
@@ -266,7 +275,7 @@ export const mockVendors = [
   {
     id: 9,
     name: "Harvey Roxie",
-    number: "harveyroxie@gmail.com",
+    contact: "harveyroxie@gmail.com",
     comapny: 65,
     location: "(444)555-6239",
     products: "admin"

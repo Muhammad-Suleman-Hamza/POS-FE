@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Form from "../../components/Form";
@@ -8,7 +8,6 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { getLocalStorage } from "../../helpers/storage";
 import { deleteItem, getItems } from "../../store/slices/item";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
@@ -28,7 +27,7 @@ const Item = () => {
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
   const itemColumns = [
-    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'itemName', headerName: 'Name', width: 200 },
     { field: 'price', headerName: 'Price', width: 200 },
     { field: 'weight', headerName: 'Weight', width: 200 },
     { field: 'dimensions', headerName: 'Dimensions', width: 200 },
@@ -39,7 +38,7 @@ const Item = () => {
           <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
           <Button {...editButton} onClick={async () => {
             const result = await dispatch(deleteItem(params.row.pk))
-            if (result.payload.status === 200) toast.success("Item is deleted.")
+            if (result.payload.status === 200) toast.warning("Item is deleted.")
           }}>Delete</Button>
         </Box>
       )

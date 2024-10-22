@@ -5,27 +5,27 @@ import Button from '@mui/material/Button';
 
 // Item
 export const initialValuesOfItem = {
-    name: "",
     price: "",
     weight: "",
+    itemName: "",
     dimensions: "",
     measuringUnit: "",
 };
 
 export const checkoutSchemaOfItem = yup.object().shape({
-    name: yup.string().required("Required"),
     price: yup.number().required("Required"),
     weight: yup.string().required("Required"),
+    itemName: yup.string().required("Required"),
     dimensions: yup.string().required("Required"),
     measuringUnit: yup.string().required("Required"),
 })
 
 export const itemFormColumns = [
     {
-        name: "name",
         label: "Name",
         type: "string",
         fullWidth: true,
+        name: "itemName",
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },
@@ -159,31 +159,41 @@ export const getOrderFormFields = (items, customers) => {
 // Customer
 
 export const initialValuesOfCustomer = {
-    name: "",
-    number: "",
+    contact: "",
+    address: "",
+    customerName: "",
 };
 
 export const checkoutSchemaOfCustomer = yup.object().shape({
-    name: yup.string().required("Required"),
-    number: yup.string().required("Required"),
+    contact: yup.number().required("Required"),
+    address: yup.string().required("Required"),
+    customerName: yup.string().required("Required"),
 })
 
 export const customerFormColumns = [
     {
-        name: "name",
         label: "Name",
         type: "string",
+        fullWidth: true,
+        variant: "filled",
+        name: "customerName",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        type: "number",
+        name: "contact",
+        label: "Contact",
         fullWidth: true,
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },
     {
-        type: "phone",
-        name: "number",
-        label: "Number",
+        type: "string",
         fullWidth: true,
+        name: "address",
+        label: "Address",
         variant: "filled",
-        sx: { gridColumn: "span 2" },
+        sx: { gridColumn: "span 4" },
     }
 ]
 
@@ -191,7 +201,7 @@ export const customerFormColumns = [
 
 export const initialValuesOfVendor = {
     name: "",
-    number: "",
+    contact: "",
     comapny: "",
     products: "",
     location: "",
@@ -199,7 +209,7 @@ export const initialValuesOfVendor = {
 
 export const checkoutSchemaOfVendor = yup.object().shape({
     name: yup.string().required("Required"),
-    number: yup.string().required("Required"),
+    contact: yup.string().required("Required"),
     comapny: yup.string().required("Required"),
     products: yup.string().required("Required"),
     location: yup.string().required("Required"),
@@ -215,9 +225,9 @@ export const vendorFormColumns = [
         sx: { gridColumn: "span 2" },
     },
     {
-        name: "number",
-        label: "Number",
         type: "number",
+        name: "contact",
+        label: "Contact",
         fullWidth: true,
         variant: "filled",
         sx: { gridColumn: "span 2" },

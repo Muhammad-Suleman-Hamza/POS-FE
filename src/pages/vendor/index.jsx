@@ -27,7 +27,7 @@ const Vendor = () => {
   
   const vendorColumns = [
     { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'number', headerName: 'Number', width: 200 },
+    { field: 'contact', headerName: 'contact', width: 200 },
     { field: 'comapny', headerName: 'Comapny', width: 200 },
     { field: 'products', headerName: 'Products', width: 200 },
     { field: 'location', headerName: 'Location', width: 200 },

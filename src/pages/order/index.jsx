@@ -31,7 +31,7 @@ const Order = () => {
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
     async (params) => {
       const result = await dispatch(deleteOrder(params.row.pk))
-      if (result.payload.status === 200) toast.success("Order is deleted.")
+      if (result.payload.status === 200) toast.warning("Order is deleted.")
   });
 
   useEffect(() => {

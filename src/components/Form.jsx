@@ -7,6 +7,7 @@ import { addItem, updateItem } from '../store/slices/item';
 import { addOrder, updateOrder } from '../store/slices/order';
 import { toggleCreateOrUpdateModal } from '../store/slices/common';
 import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
+import { addCustomer, updateCustomer } from '../store/slices/customer';
 
 const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
@@ -27,6 +28,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
         result = await dispatch(addOrder(values));
         toastText = "Order is added.";
       }
+      else if (source === 'customer') {
+        result = await dispatch(addCustomer(values));
+        toastText = "Customer is added.";
+      }
     }
     else if (button.buttonsource === 'edit') {
       if (source === 'item') {
@@ -37,9 +42,14 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
         result = await dispatch(updateOrder(values));
         toastText = "Order is updated.";
       }
+      else if (source === 'customer') {
+        result = await dispatch(updateCustomer(values));
+        toastText = "Customer is updated.";
+      }
     }
 
-    if (result.payload.status === 200) {
+    if (!result || result?.payload === undefined) toast.error(`Unable to ${button.buttonsource} ${source}`);
+    else if (result.payload.status === 200) {
       dispatch(toggleCreateOrUpdateModal())
       toast.success(toastText);
     }
