@@ -57,6 +57,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     console.log(result)
   };
 
+  const getName = (menu, inputField) => {
+    return inputField.name === "orderItem" ? menu.itemName : inputField.name === "customer" ? menu.customerName : menu.name
+  }
+
   return (
     <Box m="20px">
       <Header title={title} subtitle={subTitle} />
@@ -93,10 +97,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
                             key={menu.pk}
                             value={JSON.stringify({
                               [`${inputField.name}PK`]: menu.pk,
-                              [`${inputField.name}Name`]: menu.name
+                              [`${inputField.name}Name`]: getName(menu, inputField)
                             })}
                           >
-                            {menu.name}
+                            {getName(menu, inputField)}
                           </MenuItem>
                         )
                       }
