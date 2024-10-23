@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { tokens } from "../../theme";
+import { toast } from 'react-toastify';
 import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
@@ -8,6 +9,7 @@ import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch,useSelector } from "react-redux";
 import { editButton } from '../../constants/FormFields';
+import { deleteVendor, getVendors } from "../../store/slices/vendor";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
@@ -15,7 +17,6 @@ import {
   initialValuesOfVendor,
   checkoutSchemaOfVendor
 } from '../../constants/FormFields'
-import { vendorToBeDeleted } from "../../store/slices/vendor";
 
 const Vendor = () => {
   const theme = useTheme();
@@ -24,22 +25,28 @@ const Vendor = () => {
 
   const { vendors } = useSelector((state) => state.vendor);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
-  
+
   const vendorColumns = [
-    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'vendorName', headerName: 'Name', width: 200 },
     { field: 'contact', headerName: 'contact', width: 200 },
     { field: 'comapny', headerName: 'Comapny', width: 200 },
     { field: 'products', headerName: 'Products', width: 200 },
-    { field: 'location', headerName: 'Location', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
+    { field: 'address', headerName: 'Address', width: 200 },
+    {
+      field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
         <Box>
-            <Button {...editButton} onClick={()=> dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-            <Button {...editButton} onClick={()=> dispatch(vendorToBeDeleted(params.row))}>Delete</Button>
+          <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
+          <Button {...editButton} onClick={async () => {
+            const result = await dispatch(deleteVendor(params.row.pk))
+            if (result.payload.status === 200) toast.warning("Vendor is deleted.")
+          }}>Delete</Button>
         </Box>
-    )},
+      )
+    },
   ];
 
   useEffect(() => {
+    if (vendors?.length === 0) dispatch(getVendors())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 
@@ -78,7 +85,7 @@ const Vendor = () => {
           },
         }}
       >
-        <DataGrid rows={vendors} columns={vendorColumns} />
+        <DataGrid rows={vendors} columns={vendorColumns} getRowId={(row) => row.pk} />
 
         {/* Crate or Update vendor modal */}
         <BasicModal 
@@ -87,10 +94,11 @@ const Vendor = () => {
         >
           <Form 
             subtitle=""
+            source='vendor'
             inputsFields={vendorFormColumns}
             checkoutSchema={checkoutSchemaOfVendor}
-            title={showCreateOrUpdateModal.create ? "Create Vendor" : "Update Vendor"}
             button={showCreateOrUpdateModal.create ? addButton: editButton}
+            title={showCreateOrUpdateModal.create ? "Create Vendor" : "Update Vendor"}
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfVendor : entryToBeUpdateOrDelete}
           />
         </BasicModal>

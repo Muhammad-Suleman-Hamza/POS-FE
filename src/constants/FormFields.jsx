@@ -200,28 +200,28 @@ export const customerFormColumns = [
 // Vendor
 
 export const initialValuesOfVendor = {
-    name: "",
     contact: "",
+    address: "",
     comapny: "",
     products: "",
-    location: "",
+    vendorName: "",
 };
 
 export const checkoutSchemaOfVendor = yup.object().shape({
-    name: yup.string().required("Required"),
     contact: yup.string().required("Required"),
     comapny: yup.string().required("Required"),
     products: yup.string().required("Required"),
-    location: yup.string().required("Required"),
+    address: yup.string().required("Required"),
+    vendorName: yup.string().required("Required"),
 })
 
 export const vendorFormColumns = [
     {
-        name: "name",
         label: "Name",
         type: "string",
         fullWidth: true,
         variant: "filled",
+        name: "vendorName",
         sx: { gridColumn: "span 2" },
     },
     {
@@ -249,10 +249,10 @@ export const vendorFormColumns = [
         sx: { gridColumn: "span 2" },
     },
     {
-        name: "location",
-        label: "Location",
         type: "string",
         fullWidth: true,
+        name: "address",
+        label: "Address",
         variant: "filled",
         sx: { gridColumn: "span 2" },
     }

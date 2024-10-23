@@ -5,9 +5,10 @@ import { toast } from 'react-toastify';
 import { useDispatch } from "react-redux";
 import { addItem, updateItem } from '../store/slices/item';
 import { addOrder, updateOrder } from '../store/slices/order';
+import { addVendor, updateVendor } from '../store/slices/vendor';
 import { toggleCreateOrUpdateModal } from '../store/slices/common';
-import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
 import { addCustomer, updateCustomer } from '../store/slices/customer';
+import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
 
 const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
@@ -32,6 +33,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
         result = await dispatch(addCustomer(values));
         toastText = "Customer is added.";
       }
+      else if (source === 'vendor') {
+        result = await dispatch(addVendor(values));
+        toastText = "Vendor is added.";
+      }
     }
     else if (button.buttonsource === 'edit') {
       if (source === 'item') {
@@ -45,6 +50,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
       else if (source === 'customer') {
         result = await dispatch(updateCustomer(values));
         toastText = "Customer is updated.";
+      }
+      else if (source === 'vendor') {
+        result = await dispatch(updateVendor(values));
+        toastText = "Vendor is updated.";
       }
     }
 
