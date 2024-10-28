@@ -197,20 +197,61 @@ export const customerFormColumns = [
     }
 ]
 
+// Customer
+
+export const initialValuesOfProfile = {
+    DB: "",
+    email: "",
+    password: "",
+};
+
+export const checkoutSchemaOfProfile = yup.object().shape({
+    contact: yup.number().required("Required"),
+    address: yup.string().required("Required"),
+    customerName: yup.string().required("Required"),
+})
+
+export const customerFormProfile = [
+    {
+        label: "Name",
+        type: "string",
+        fullWidth: true,
+        variant: "filled",
+        name: "customerName",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        type: "number",
+        name: "contact",
+        label: "Contact",
+        fullWidth: true,
+        variant: "filled",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        type: "string",
+        fullWidth: true,
+        name: "address",
+        label: "Address",
+        variant: "filled",
+        sx: { gridColumn: "span 4" },
+    }
+]
+
 // Vendor
 
 export const initialValuesOfVendor = {
     contact: "",
     address: "",
     comapny: "",
-    products: "",
+    // products: "",
     vendorName: "",
 };
 
 export const checkoutSchemaOfVendor = yup.object().shape({
     contact: yup.string().required("Required"),
     comapny: yup.string().required("Required"),
-    products: yup.string().required("Required"),
+    // products: yup.string().required("Required"),
     address: yup.string().required("Required"),
     vendorName: yup.string().required("Required"),
 })
@@ -240,14 +281,14 @@ export const vendorFormColumns = [
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },
-    {
-        name: "products",
-        label: "Products",
-        type: "string",
-        fullWidth: true,
-        variant: "filled",
-        sx: { gridColumn: "span 2" },
-    },
+    // {
+    //     name: "products",
+    //     label: "Products",
+    //     type: "string",
+    //     fullWidth: true,
+    //     variant: "filled",
+    //     sx: { gridColumn: "span 2" },
+    // },
     {
         type: "string",
         fullWidth: true,
@@ -257,6 +298,43 @@ export const vendorFormColumns = [
         sx: { gridColumn: "span 2" },
     }
 ]
+
+// User
+
+export const checkoutSchemaOfUser = yup.object().shape({
+    newPassword: yup.string(),
+    currentPassword: yup.string(),
+    email: yup.string().required("Required")
+})
+
+export const userFormColumns = [
+    {
+        name: "email",
+        label: "Email",
+        type: "string",
+        fullWidth: true,
+        variant: "filled",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        fullWidth: true,
+        type: "password",
+        variant: "filled",
+        name: "currentPassword",
+        label: "Current password",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        fullWidth: true,
+        type: "password",
+        variant: "filled",
+        name: "newPassword",
+        label: "New password",
+        sx: { gridColumn: "span 2" },
+    }
+]
+
+// Buttons
 
 export const addButton = {
     title: "Add",

@@ -2,6 +2,7 @@ import Item from "./pages/item";
 import Login from "./pages/login";
 import Order from "./pages/order";
 import Vendor from "./pages/vendor";
+import Profile from "./pages/profile";
 import Toast from "./components/Toast";
 import Customer from "./pages/customer";
 import Dashboard from "./pages/dashboard";
@@ -27,9 +28,11 @@ const App = () => {
               <Routes>
                 <Route>
                   {/* <Route element={<ProtectedRoute />}> */}
+                  <Route path="/" element={<Dashboard />} />
                   <Route path="/items" element={<Item />} />
                   <Route path="/orders" element={<Order />} />
                   <Route path="/vendors" element={<Vendor />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/customers" element={<Customer />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                 </Route>

@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { endpoints } from '../../constants/apiEndpoints';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { setSessionStorage } from '../../helpers/storage';
+import { getSessionStorage, setSessionStorage } from '../../helpers/storage';
 
 const initialState = {
-    user: undefined
+    user: getSessionStorage('user') || undefined
 }
 
 export const login = createAsyncThunk(
@@ -15,6 +15,14 @@ export const login = createAsyncThunk(
     }
 )
 
+export const updateUser = createAsyncThunk(
+  '/user/update',
+  async (data) => {
+    const user = axios.post(`${endpoints.user}/user/update`, data)
+    return user
+  }
+)
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -23,7 +31,11 @@ export const authSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(login.fulfilled, (state, { payload : { data } }) => {
       state.user = data;
-      setSessionStorage('sessionToken', data.sessionToken)
+      setSessionStorage('user', data)
+    })
+    builder.addCase(updateUser.fulfilled, (state, { payload : { data } }) => {
+      state.user = data;
+      setSessionStorage('user', data)
     })
   }
 })

@@ -30,7 +30,7 @@ const Vendor = () => {
     { field: 'vendorName', headerName: 'Name', width: 200 },
     { field: 'contact', headerName: 'contact', width: 200 },
     { field: 'comapny', headerName: 'Comapny', width: 200 },
-    { field: 'products', headerName: 'Products', width: 200 },
+    // { field: 'products', headerName: 'Products', width: 200 },
     { field: 'address', headerName: 'Address', width: 200 },
     {
       field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (

@@ -140,42 +140,80 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Resent Orders
+                Recent Orders
               </Typography>
             </Box>
-            {orders.map((order, i) => {
-              return (
-                <Box
-                  p="15px"
-                  display="flex"
-                  alignItems="center"
-                  key={`${order}-${i}`}
-                  justifyContent="space-between"
-                  borderBottom={`4px solid ${colors.primary[500]}`}
-                >
-                  <Box>
-                    <Typography
-                      variant="h5"
-                      fontWeight="600"
-                      color={colors.greenAccent[100]}
-                    >
-                      {order.name}
-                    </Typography>
-                    <Typography color={colors.grey[100]}>
-                      {order.price}
-                    </Typography>
-                  </Box>
-                  <Box color={colors.grey[100]}>{order.customer}</Box>
-                  <Box
-                    p="5px 10px"
-                    borderRadius="4px"
-                    color={colors.greenAccent[500]}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              borderBottom={`4px solid ${colors.primary[500]}`}
+              color={colors.grey[100]}
+              p="15px"
+            >
+              <Typography
+                width={100}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Customer
+              </Typography>
+              <Typography
+                width={100}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Price
+              </Typography>
+              <Typography
+                width={100}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Payment
+              </Typography>
+            </Box>
+            {orders.map((order, i) => (
+              <Box
+                p="15px"
+                display="flex"
+                alignItems="center"
+                key={`${order}-${i}`}
+                justifyContent="space-between"
+                borderBottom={`4px solid ${colors.primary[500]}`}
+              >
+                <Box width={100}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
                   >
-                    ${order.paymentMethod}
-                  </Box>
+                    {order.customerName}
+                  </Typography>
                 </Box>
-              );
-            })}
+                <Box width={100}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.price}
+                  </Typography>
+                </Box>
+                <Box width={100}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.paymentMethodName}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
           </Box>
         </Grid>
       </Grid>

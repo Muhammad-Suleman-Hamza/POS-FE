@@ -47,11 +47,11 @@ export const pages = {
             "route": "profile",
             "icon": <PersonOutlinedIcon />
         },
-        {
-            "title": "Configurations",
-            "route": "configurations",
-            "icon": <HelpOutlineOutlinedIcon />
-        },
+        // {
+        //     "title": "Configurations",
+        //     "route": "configurations",
+        //     "icon": <HelpOutlineOutlinedIcon />
+        // },
         {
             "title": "Logout",
             "route": "logout",
