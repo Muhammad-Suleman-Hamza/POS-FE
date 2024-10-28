@@ -1,141 +1,66 @@
-import {
-  Box,
-  IconButton,
-  Typography,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
-import LineChart from "../../components/LineChart";
-import BarChart from "../../components/BarChart";
+import { useSelector } from "react-redux";
 import StatBox from "../../components/StatBox";
+import Grid from "@mui/material/Unstable_Grid2";
+import BarChart from "../../components/BarChart";
+import LineChart from "../../components/LineChart";
+import { Box, useTheme, Typography } from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 
 const Dashboard = () => {
   const theme = useTheme();
-  const smScreen = useMediaQuery(theme.breakpoints.up("sm"));
   const colors = tokens(theme.palette.mode);
+
+  const { items } = useSelector((state) => state.item);
+  const { orders } = useSelector((state) => state.order);
+  const { vendors } = useSelector((state) => state.vendor);
+  const { customers } = useSelector((state) => state.customer);
+
+  const stats = [
+    {
+      value: items?.length,
+      heading: "Total Items",
+    },
+    {
+      value: orders?.length,
+      heading: "Total Orders",
+    },
+    {
+      value: vendors?.length,
+      heading: "Total Vendors",
+    },
+    {
+      value: customers?.length,
+      heading: "Total Customers",
+    }
+  ]
+
   return (
     <Box m="20px">
-      {/* HEADER */}
-
-      {/* <Box
-        display={smScreen ? "flex" : "block"}
-        flexDirection={smScreen ? "row" : "column"}
-        justifyContent={smScreen ? "space-between" : "start"}
-        alignItems={smScreen ? "center" : "start"}
-        m="10px 0"
-      >
-        <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
-        </Box>
-      </Box> */}
-
-      {/* GRID & CHARTS */}
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-        <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-          <Box
-            width="100%"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="12,361"
-              subtitle="Emails Sent"
-              progress="0.75"
-              increase="+14%"
-              icon={
-                <EmailIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+        {/* Stats */}
+        {
+          stats.map((stats, index) => (
+            <Grid key={index} xs={12} sm={12} md={6} lg={3} xl={3}>
+              <Box
+                width="100%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                backgroundColor={colors.primary[400]}
+              >
+                <StatBox
+                  value={stats.value}
+                  heading={stats.heading}
                 />
-              }
-            />
-          </Box>
-        </Grid>
-        <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-          <Box
-            width="100%"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="431,225"
-              subtitle="Sales Obtained"
-              progress="0.50"
-              increase="+21%"
-              icon={
-                <PointOfSaleIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
-          </Box>
-        </Grid>
-        <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-          <Box
-            width="100%"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="32,441"
-              subtitle="New Clients"
-              progress="0.30"
-              increase="+5%"
-              icon={
-                <PersonAddIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
-          </Box>
-        </Grid>
-        <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-          <Box
-            width="100%"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title="1,325,134"
-              subtitle="Traffic Received"
-              progress="0.80"
-              increase="+43%"
-              icon={
-                <TrafficIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                />
-              }
-            />
-          </Box>
-        </Grid>
+              </Box>
+            </Grid>
+          ))
+        }
 
-        <Grid
+        {/* <Grid
           xs={12}
           sm={12}
           md={8}
@@ -159,7 +84,7 @@ const Dashboard = () => {
                     fontWeight="600"
                     color={colors.grey[100]}
                   >
-                    Revenue Generated
+                    Today Generated
                   </Typography>
                   <Typography
                     variant="h5"
@@ -175,6 +100,7 @@ const Dashboard = () => {
               </Box>
             </Box>
           </Grid>
+
           <Grid xs={12} sm={12} md={12}>
             <Box backgroundColor={colors.primary[400]}>
               <Typography
@@ -182,21 +108,38 @@ const Dashboard = () => {
                 fontWeight="600"
                 sx={{ padding: "30px 30px 0 30px" }}
               >
-                Sales Quantity
+                Today Quantity
               </Typography>
               <Box height="250px" mt="-20px">
                 <BarChart isDashboard={true} />
               </Box>
             </Box>
           </Grid>
-        </Grid>
-        <Grid xs={12} sm={12} md={4} lg={4} xl={4}>
+        </Grid> */}
+
+        {/* Recent Orders */}
+        <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
           <Box
             backgroundColor={colors.primary[400]}
             maxHeight="100vh"
             overflow="auto"
             m="25px 0 0 0"
           >
+            <Box
+              p="15px"
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              borderBottom={`4px solid ${colors.primary[500]}`}
+            >
+              <Typography
+                variant="h3"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Recent Orders
+              </Typography>
+            </Box>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -206,46 +149,85 @@ const Dashboard = () => {
               p="15px"
             >
               <Typography
+                width={200}
                 variant="h5"
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Resent Orders
+                Customer
+              </Typography>
+              <Typography
+                width={100}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Price
+              </Typography>
+              <Typography
+                width={100}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Payment
+              </Typography>
+              <Typography
+                width={200}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Purchased Time
               </Typography>
             </Box>
-            {mockTransactions.map((transaction, i) => {
-              return (
-                <Box
-                  key={`${transaction}-${i}`}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  borderBottom={`4px solid ${colors.primary[500]}`}
-                  p="15px"
-                >
-                  <Box>
-                    <Typography
-                      variant="h5"
-                      fontWeight="600"
-                      color={colors.greenAccent[100]}
-                    >
-                      {transaction.txId}
-                    </Typography>
-                    <Typography color={colors.grey[100]}>
-                      {transaction.user}
-                    </Typography>
-                  </Box>
-                  <Box color={colors.grey[100]}>{transaction.date}</Box>
-                  <Box
-                    color={colors.greenAccent[500]}
-                    p="5px 10px"
-                    borderRadius="4px"
+            {orders.map((order, i) => (
+              <Box
+                p="15px"
+                display="flex"
+                alignItems="center"
+                key={`${order}-${i}`}
+                justifyContent="space-between"
+                borderBottom={`4px solid ${colors.primary[500]}`}
+              >
+                <Box width={200}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
                   >
-                    ${transaction.cost}
-                  </Box>
+                    {order.customerName}
+                  </Typography>
                 </Box>
-              );
-            })}
+                <Box width={100}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.price}
+                  </Typography>
+                </Box>
+                <Box width={100}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.paymentMethodName}
+                  </Typography>
+                </Box>
+                <Box width={200}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.createdDate}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
           </Box>
         </Grid>
       </Grid>
