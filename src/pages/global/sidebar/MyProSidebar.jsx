@@ -2,7 +2,7 @@ import { useState } from "react";
 import { tokens } from "../../../theme";
 import { Link } from "react-router-dom";
 import { useProSidebar } from "react-pro-sidebar";
-import { pages } from '../../../constants/constants'
+import { pages } from '../../../constants/generic'
 import { useSidebarContext } from "./sidebarContext";
 import { Menu, Sidebar, MenuItem } from "react-pro-sidebar";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";

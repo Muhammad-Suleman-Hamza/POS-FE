@@ -1,0 +1,39 @@
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.root {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.size {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center
+}
+
+.paper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 1rem 2rem !important;
+}
+
+.avatar {
+    margin-top: 1rem !important
+}
+
+.form {
+    width: 100%;
+    margin-top: 1rem !important
+}
+
+.submit {
+    margin: 20px 0 !important;
+}
