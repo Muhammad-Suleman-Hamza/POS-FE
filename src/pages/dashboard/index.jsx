@@ -42,8 +42,8 @@ const Dashboard = () => {
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         {/* Stats */}
         {
-          stats.map((stat) => (
-            <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
+          stats.map((stats, index) => (
+            <Grid key={index} xs={12} sm={12} md={6} lg={3} xl={3}>
               <Box
                 width="100%"
                 display="flex"
@@ -52,15 +52,15 @@ const Dashboard = () => {
                 backgroundColor={colors.primary[400]}
               >
                 <StatBox
-                  value={stat.value}
-                  heading={stat.heading}
+                  value={stats.value}
+                  heading={stats.heading}
                 />
               </Box>
             </Grid>
           ))
         }
 
-        <Grid
+        {/* <Grid
           xs={12}
           sm={12}
           md={8}
@@ -69,7 +69,6 @@ const Dashboard = () => {
           rowSpacing={1}
           columnSpacing={{ xs: 1, sm: 2, md: 3 }}
         >
-          {/* Today Revenue */}
           <Grid xs={12}>
             <Box backgroundColor={colors.primary[400]}>
               <Box
@@ -102,7 +101,6 @@ const Dashboard = () => {
             </Box>
           </Grid>
 
-          {/* Today Sales */}
           <Grid xs={12} sm={12} md={12}>
             <Box backgroundColor={colors.primary[400]}>
               <Typography
@@ -117,10 +115,10 @@ const Dashboard = () => {
               </Box>
             </Box>
           </Grid>
-        </Grid>
+        </Grid> */}
 
         {/* Recent Orders */}
-        <Grid xs={12} sm={12} md={4} lg={4} xl={4}>
+        <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
           <Box
             backgroundColor={colors.primary[400]}
             maxHeight="100vh"
@@ -128,15 +126,14 @@ const Dashboard = () => {
             m="25px 0 0 0"
           >
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              color={colors.grey[100]}
               p="15px"
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              borderBottom={`4px solid ${colors.primary[500]}`}
             >
               <Typography
-                variant="h5"
+                variant="h3"
                 fontWeight="600"
                 color={colors.grey[100]}
               >
@@ -152,7 +149,7 @@ const Dashboard = () => {
               p="15px"
             >
               <Typography
-                width={100}
+                width={200}
                 variant="h5"
                 fontWeight="600"
                 color={colors.grey[100]}
@@ -175,6 +172,14 @@ const Dashboard = () => {
               >
                 Payment
               </Typography>
+              <Typography
+                width={200}
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Purchased Time
+              </Typography>
             </Box>
             {orders.map((order, i) => (
               <Box
@@ -185,7 +190,7 @@ const Dashboard = () => {
                 justifyContent="space-between"
                 borderBottom={`4px solid ${colors.primary[500]}`}
               >
-                <Box width={100}>
+                <Box width={200}>
                   <Typography
                     variant="h5"
                     fontWeight="600"
@@ -210,6 +215,15 @@ const Dashboard = () => {
                     color={colors.greenAccent[100]}
                   >
                     {order.paymentMethodName}
+                  </Typography>
+                </Box>
+                <Box width={200}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="600"
+                    color={colors.greenAccent[100]}
+                  >
+                    {order.createdDate}
                   </Typography>
                 </Box>
               </Box>
