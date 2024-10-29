@@ -105,13 +105,12 @@ const SingleOrder = () => {
             >
                 <DataGrid 
                     rows={order} 
-                    columns={orderColumns} 
-                    getRowId={(row) => row.id} 
-                    hideFooter
                     unstable_rowSpanning
+                    columns={orderColumns} 
                     showCellVerticalBorder
                     showColumnVerticalBorder
                     disableRowSelectionOnClick
+                    getRowId={(row) => row.id} 
                 />
 
                 <BasicModal

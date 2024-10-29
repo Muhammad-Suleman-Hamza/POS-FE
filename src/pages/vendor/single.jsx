@@ -80,7 +80,15 @@ const SingleVendor = () => {
                     },
                 }}
             >
-                <DataGrid rows={vendor} columns={vendorColumns} getRowId={(row) => row.pk} />
+                <DataGrid
+                    rows={vendor}
+                    unstable_rowSpanning
+                    showCellVerticalBorder
+                    columns={vendorColumns}
+                    showColumnVerticalBorder
+                    disableRowSelectionOnClick
+                    getRowId={(row) => row.pk}
+                />
 
                 {/* Crate or Update vendor modal */}
                 <BasicModal

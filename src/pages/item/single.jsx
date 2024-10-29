@@ -27,7 +27,7 @@ const SingleItem = () => {
     const colors = tokens(theme.palette.mode);
 
     const [item, setItem] = useState([]);
-    
+
     const { items } = useSelector((state) => state.item);
     const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
@@ -81,7 +81,15 @@ const SingleItem = () => {
                     },
                 }}
             >
-                <DataGrid rows={item} columns={itemColumns} getRowId={(item) => item.pk} />
+                <DataGrid
+                    rows={item}
+                    unstable_rowSpanning
+                    showCellVerticalBorder
+                    showColumnVerticalBorder
+                    columns={itemColumns}
+                    disableRowSelectionOnClick
+                    getRowId={(row) => row.pk}
+                />
                 {/* Crate or Update item modal */}
                 <BasicModal
                     handleClose={() => dispatch(toggleCreateOrUpdateModal())}

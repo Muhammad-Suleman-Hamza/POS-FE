@@ -77,7 +77,15 @@ const Item = () => {
           },
         }}
       >
-        <DataGrid rows={items} columns={itemColumns} getRowId={(row) => row.pk} />
+        <DataGrid
+          rows={items}
+          unstable_rowSpanning
+          columns={itemColumns}
+          showCellVerticalBorder
+          showColumnVerticalBorder
+          disableRowSelectionOnClick
+          getRowId={(row) => row.pk}
+        />
         {/* Crate or Update item modal */}
         <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}

@@ -7,7 +7,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { editButton, getVendorColumns } from '../../constants/FormFields';
 import { deleteVendor, getVendors } from "../../store/slices/vendor";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
@@ -76,19 +76,27 @@ const Vendor = () => {
           },
         }}
       >
-        <DataGrid rows={vendors} columns={vendorColumns} getRowId={(row) => row.pk} />
+        <DataGrid
+          rows={vendors}
+          unstable_rowSpanning
+          showCellVerticalBorder
+          columns={vendorColumns}
+          showColumnVerticalBorder
+          disableRowSelectionOnClick
+          getRowId={(row) => row.pk}
+        />
 
         {/* Crate or Update vendor modal */}
-        <BasicModal 
+        <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update} 
+          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
         >
-          <Form 
+          <Form
             subtitle=""
             source='vendor'
             inputsFields={vendorFormColumns}
             checkoutSchema={checkoutSchemaOfVendor}
-            button={showCreateOrUpdateModal.create ? addButton: editButton}
+            button={showCreateOrUpdateModal.create ? addButton : editButton}
             title={showCreateOrUpdateModal.create ? "Create Vendor" : "Update Vendor"}
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfVendor : entryToBeUpdateOrDelete}
           />

@@ -78,7 +78,15 @@ const Order = () => {
           },
         }}
       >
-        <DataGrid rows={orders} columns={orderColumns} getRowId={(row) => row.pk} />
+        <DataGrid
+          rows={orders}
+          unstable_rowSpanning
+          columns={orderColumns}
+          showCellVerticalBorder
+          showColumnVerticalBorder
+          disableRowSelectionOnClick
+          getRowId={(row) => row.pk}
+        />
 
         <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}

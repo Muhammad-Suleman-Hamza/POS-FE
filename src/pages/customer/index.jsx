@@ -76,7 +76,15 @@ const Customer = () => {
           },
         }}
       >
-        <DataGrid rows={customers} columns={customerColumns} getRowId={(row) => row.pk} />
+        <DataGrid
+          rows={customers}
+          unstable_rowSpanning
+          showCellVerticalBorder
+          showColumnVerticalBorder
+          columns={customerColumns}
+          disableRowSelectionOnClick
+          getRowId={(row) => row.pk}
+        />
 
         <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}

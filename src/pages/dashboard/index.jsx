@@ -1,7 +1,7 @@
 import { tokens } from "../../theme";
+import Grid from '@mui/material/Grid2';
 import { useSelector } from "react-redux";
 import StatBox from "../../components/StatBox";
-import Grid from "@mui/material/Unstable_Grid2";
 import BarChart from "../../components/BarChart";
 import LineChart from "../../components/LineChart";
 import { Box, useTheme, Typography } from "@mui/material";
