@@ -153,7 +153,7 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={title} subtitle={subTitle} />
-        {source === 'order' ? <Button {...addButton} onClick={addNewItem}>Add New Item</Button> : <></>}
+        {source === 'order' ? <Button {...addButton} onClick={addNewItem}>Add new order item</Button> : <></>}
       </Box>
       <Formik onSubmit={handleFormSubmit} initialValues={initialValues} validationSchema={checkoutSchema}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (

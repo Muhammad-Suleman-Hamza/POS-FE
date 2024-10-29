@@ -43,7 +43,7 @@ const Dashboard = () => {
         {/* Stats */}
         {
           stats.map((stats, index) => (
-            <Grid key={index} xs={12} sm={12} md={6} lg={3} xl={3}>
+            <Grid key={index} size={3}>
               <Box
                 width="100%"
                 display="flex"
@@ -118,7 +118,7 @@ const Dashboard = () => {
         </Grid> */}
 
         {/* Recent Orders */}
-        <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid size={6}>
           <Box
             backgroundColor={colors.primary[400]}
             maxHeight="100vh"

@@ -4,15 +4,16 @@ import { toast } from 'react-toastify';
 import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
-import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
+import { Link, useParams } from "react-router-dom";
 import { deleteItem } from "../../store/slices/item";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
     addButton,
+    backButton,
     editButton,
     getItemColumns,
     itemFormColumns,
@@ -50,7 +51,7 @@ const SingleItem = () => {
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Header title={`Item: ${id}`} subtitle="" />
-                <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Item</Button>
+                <Button {...backButton}><Link to={'/items'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
             </Box>
             <Box
                 m="8px 0 0 0"

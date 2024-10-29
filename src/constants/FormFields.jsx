@@ -137,7 +137,7 @@ export const getOrderFormFields = (items, customers) => {
             inputType: "select",
             menuItems: customers,
             label: "Select Customer",
-            sx: { gridColumn: "span 3" }
+            sx: { gridColumn: "span 2" }
         },
         {
             type: "string",
@@ -374,6 +374,17 @@ export const viewButton = {
     type: "button",
     color: "secondary",
     buttonsource: 'view',
+    variant: "contained",
+    style: { marginLeft: 16 },
+    sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
+}
+
+export const backButton = {
+    title: "Back",
+    type: "button",
+    color: "secondary",
+    buttonsource: 'back',
     variant: "contained",
     style: { marginLeft: 16 },
     sx: { gridColumn: "span 4" },

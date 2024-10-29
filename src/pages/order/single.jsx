@@ -5,17 +5,20 @@ import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { useParams } from "react-router-dom";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
+import { Link, useParams } from "react-router-dom";
 import { deleteOrder } from "../../store/slices/order";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
-import { editButton, getOrderFormFields, getSingleOrderColumns } from '../../constants/FormFields';
 import {
     addButton,
+    backButton, 
+    editButton, 
+    getOrderFormFields,
     initialValuesOfOrder,
-    checkoutSchemaOfOrder
+    checkoutSchemaOfOrder,
+    getSingleOrderColumns
 } from '../../constants/FormFields'
 
 const SingleOrder = () => {
@@ -71,8 +74,8 @@ const SingleOrder = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={`Orders: ${id}`} subtitle="" />
-                <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Order</Button>
+                <Header title={`Order: ${id}`} subtitle="" />
+                <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
             </Box>
             <Box
                 m="8px 0 0 0"
