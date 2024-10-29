@@ -1,53 +1,55 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
+import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { deleteOrder, getOrders } from "../../store/slices/order";
-import { editButton, getOrderColumns, getOrderFormFields } from '../../constants/FormFields';
+import { editButton, getCustomerColumns } from '../../constants/FormFields';
+import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
-  initialValuesOfOrder,
-  checkoutSchemaOfOrder
+  customerFormColumns,
+  initialValuesOfCustomer,
+  checkoutSchemaOfCustomer
 } from '../../constants/FormFields'
 
-const Order = () => {
+const SingleCustomer = () => {
   const theme = useTheme();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const colors = tokens(theme.palette.mode);
 
-  const { items } = useSelector((state) => state.item);
-  const { orders } = useSelector((state) => state.order);
+  const [customer, setCustomer] = useState([]);
+
   const { customers } = useSelector((state) => state.customer);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-  const formColumns = getOrderFormFields(items, customers);
-  const orderColumns = getOrderColumns(
-    '',
+  const customerColumns = getCustomerColumns(
+    'single',
     (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
     async (params) => {
-      const result = await dispatch(deleteOrder(params.row.pk))
-      if (result.payload.status === 200) toast.warning("Order is deleted.")
+      const result = await dispatch(deleteCustomer(params.row.pk));
+      if (result.payload.status === 200) toast.warning("Customer is deleted.")
     }
   );
 
   useEffect(() => {
-    if (orders?.length === 0) dispatch(getOrders())
+    if (id && !customer.length) setCustomer(customers.filter((customer) => customer.pk === id));
     return () => dispatch(toggleCreateOrUpdateModal())
-  }, [])
+  }, []);
 
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Orders" subtitle="" />
-        <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Order</Button>
+        <Header title={`Customers: ${id}`} subtitle="" />
+        <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Customer</Button>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -78,7 +80,7 @@ const Order = () => {
           },
         }}
       >
-        <DataGrid rows={orders} columns={orderColumns} getRowId={(row) => row.pk} />
+        <DataGrid rows={customer} columns={customerColumns} getRowId={(row) => row.pk} />
 
         <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
@@ -86,12 +88,12 @@ const Order = () => {
         >
           <Form
             subtitle=""
-            source='order'
-            inputsFields={formColumns}
-            checkoutSchema={checkoutSchemaOfOrder}
+            source='customer'
+            inputsFields={customerFormColumns}
+            checkoutSchema={checkoutSchemaOfCustomer}
             button={showCreateOrUpdateModal.create ? addButton : editButton}
-            title={showCreateOrUpdateModal.create ? "Create Order" : "Update Order"}
-            initialValues={showCreateOrUpdateModal.create ? initialValuesOfOrder : entryToBeUpdateOrDelete}
+            title={showCreateOrUpdateModal.create ? "Create Customer" : "Update Customer"}
+            initialValues={showCreateOrUpdateModal.create ? initialValuesOfCustomer : entryToBeUpdateOrDelete}
           />
         </BasicModal>
       </Box>
@@ -99,4 +101,4 @@ const Order = () => {
   );
 };
 
-export default Order;
+export default SingleCustomer;

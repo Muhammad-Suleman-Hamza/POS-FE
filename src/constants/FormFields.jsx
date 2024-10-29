@@ -1,7 +1,8 @@
 import * as yup from 'yup';
 import { Box } from '@mui/material';
-import { paymentMethods } from './generic';
+import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import { paymentMethods } from './generic';
 
 // Item
 export const initialValuesOfItem = {
@@ -19,6 +20,22 @@ export const checkoutSchemaOfItem = yup.object().shape({
     dimensions: yup.string().required("Required"),
     measuringUnit: yup.string().required("Required"),
 })
+
+export const getItemColumns = (source = '', redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'pk', headerName: 'ID', width: 200 },
+        { field: 'itemName', headerName: 'Name', width: 200 },
+        { field: 'price', headerName: 'Price', width: 200 },
+        { field: 'weight', headerName: 'Weight', width: 200 },
+        { field: 'dimensions', headerName: 'Dimensions', width: 200 },
+        { field: 'measuringUnit', headerName: 'Measuring Unit', width: 200 },
+    ];
+
+    if (source !== 'single') {
+        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
+    }
+    return columns;
+}
 
 export const itemFormColumns = [
     {
@@ -66,7 +83,7 @@ export const itemFormColumns = [
 // Order
 export const initialValuesOfOrder = {
     price: "",
-    weight: "",
+    quantity: "",
     customer: "",
     orderItem: "",
     paymentMethod: "",
@@ -74,63 +91,43 @@ export const initialValuesOfOrder = {
 
 export const checkoutSchemaOfOrder = yup.object().shape({
     price: yup.number().required(),
-    weight: yup.string().required(),
+    quantity: yup.string().required(),
     customer: yup.string().required(),
     orderItem: yup.string().required(),
     paymentMethod: yup.string().required(),
 })
 
-export const getOrderColumns = (editOnClick, deleteOnClick) => {
-    return [
-        { field: 'orderItemName', headerName: 'Item', width: 200 },
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'weight', headerName: 'Weight', width: 200 },
+export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'pk', headerName: 'ID', width: 200 },
         { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
         { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
-        {
-            field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
-                <Box>
-                    <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>
-                    <Button {...editButton} onClick={() => deleteOnClick(params)}>Delete</Button>
-                </Box>
-            )
-        },
     ];
+
+    if (source !== 'single') {
+        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
+    }
+    return columns;
 }
+
+export const getSingleOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 200 },
+        { field: 'orderItem', headerName: 'Item', width: 200 },
+        { field: 'price', headerName: 'Price', width: 200 },
+        { field: 'quantity', headerName: 'Quantity', width: 200 },
+        { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
+        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
+    ];
+
+    return columns;
+}
+
 
 export const getOrderFormFields = (items, customers) => {
     return [
-        {
-            type: "string",
-            required: true,
-            fullWidth: true,
-            menuItems: items,
-            name: "orderItem",
-            variant: "filled",
-            inputType: "select",
-            label: "Select Item",
-            sx: { gridColumn: "span 2" }
-        },
-        {
-            name: "price",
-            label: "Price",
-            type: "number",
-            required: true,
-            fullWidth: true,
-            variant: "filled",
-            inputType: "input",
-            sx: { gridColumn: "span 2" }
-        },
-        {
-            name: "weight",
-            label: "Weight",
-            required: true,
-            type: "string",
-            fullWidth: true,
-            variant: "filled",
-            inputType: "input",
-            sx: { gridColumn: "span 2" }
-        },
         {
             type: "string",
             required: true,
@@ -140,7 +137,7 @@ export const getOrderFormFields = (items, customers) => {
             inputType: "select",
             menuItems: customers,
             label: "Select Customer",
-            sx: { gridColumn: "span 2" }
+            sx: { gridColumn: "span 3" }
         },
         {
             type: "string",
@@ -152,6 +149,37 @@ export const getOrderFormFields = (items, customers) => {
             menuItems: paymentMethods,
             sx: { gridColumn: "span 2" },
             label: "Select Payment Method"
+        },
+        {
+            type: "string",
+            required: true,
+            fullWidth: true,
+            menuItems: items,
+            name: "orderItem",
+            variant: "filled",
+            inputType: "select",
+            label: "Select item",
+            sx: { gridColumn: "span 2" }
+        },
+        {
+            name: "price",
+            type: "number",
+            required: true,
+            fullWidth: true,
+            variant: "filled",
+            inputType: "input",
+            label: "Add Price",
+            sx: { gridColumn: "span 2" }
+        },
+        {
+            required: true,
+            type: "string",
+            name: "quantity",
+            fullWidth: true,
+            variant: "filled",
+            inputType: "input",
+            label: "Add Quantity",
+            sx: { gridColumn: "span 2" }
         }
     ];
 }
@@ -170,48 +198,20 @@ export const checkoutSchemaOfCustomer = yup.object().shape({
     customerName: yup.string().required("Required"),
 })
 
-export const customerFormColumns = [
-    {
-        label: "Name",
-        type: "string",
-        fullWidth: true,
-        variant: "filled",
-        name: "customerName",
-        sx: { gridColumn: "span 2" },
-    },
-    {
-        type: "number",
-        name: "contact",
-        label: "Contact",
-        fullWidth: true,
-        variant: "filled",
-        sx: { gridColumn: "span 2" },
-    },
-    {
-        type: "string",
-        fullWidth: true,
-        name: "address",
-        label: "Address",
-        variant: "filled",
-        sx: { gridColumn: "span 4" },
+export const getCustomerColumns = (source, redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'customerName', headerName: 'Name', width: 200 },
+        { field: 'contact', headerName: 'Contact', width: 200 },
+        { field: 'address', headerName: 'Address', width: 200 },
+    ];
+
+    if (source !== 'single') {
+        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
     }
-]
+    return columns;
+}
 
-// Customer
-
-export const initialValuesOfProfile = {
-    DB: "",
-    email: "",
-    password: "",
-};
-
-export const checkoutSchemaOfProfile = yup.object().shape({
-    contact: yup.number().required("Required"),
-    address: yup.string().required("Required"),
-    customerName: yup.string().required("Required"),
-})
-
-export const customerFormProfile = [
+export const customerFormColumns = [
     {
         label: "Name",
         type: "string",
@@ -255,6 +255,20 @@ export const checkoutSchemaOfVendor = yup.object().shape({
     address: yup.string().required("Required"),
     vendorName: yup.string().required("Required"),
 })
+
+export const getVendorColumns = (source, redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'vendorName', headerName: 'Name', width: 200 },
+        { field: 'contact', headerName: 'contact', width: 200 },
+        { field: 'comapny', headerName: 'Comapny', width: 200 },
+        { field: 'address', headerName: 'Address', width: 200 },
+    ];
+
+    if (source !== 'single') {
+        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
+    }
+    return columns;
+}
 
 export const vendorFormColumns = [
     {
@@ -353,4 +367,25 @@ export const editButton = {
     variant: "contained",
     style: { marginLeft: 16 },
     sx: { gridColumn: "span 4" }
+}
+
+export const viewButton = {
+    title: "View",
+    type: "button",
+    color: "secondary",
+    buttonsource: 'view',
+    variant: "contained",
+    style: { marginLeft: 16 },
+    sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
+}
+
+export const getRowButtons = (params, redirect, editOnClick, deleteOnClick) => {
+    return (
+        <Box>
+            <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>
+            <Button {...editButton} onClick={() => deleteOnClick(params)}>Delete</Button>
+            <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>
+        </Box>
+    )
 }

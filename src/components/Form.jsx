@@ -1,8 +1,9 @@
-import React from 'react'
 import Header from "./Header";
 import { Formik } from "formik";
 import { toast } from 'react-toastify';
-import { useDispatch } from "react-redux";
+import React, { useState } from 'react'
+import { addButton } from '../constants/FormFields';
+import { useDispatch, useSelector } from "react-redux";
 import { addItem, updateItem } from '../store/slices/item';
 import { addOrder, updateOrder } from '../store/slices/order';
 import { addVendor, updateVendor } from '../store/slices/vendor';
@@ -13,12 +14,19 @@ import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
 const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  
+  const { items } = useSelector((state) => state.item);
+
+  const [itemCount, setItemCount] = useState(1);
+  const [formInputFields, setFormInputFields] = useState(inputsFields);
 
   const handleFormSubmit = async (values) => {
     console.log('values :: ', values);
 
     let toastText = undefined;
     let result = undefined;
+
+    if (source === 'order' && itemCount > 1) values = combineOrderItems(values);
 
     if (button.buttonsource === 'add') {
       if (source === 'item') {
@@ -67,12 +75,86 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
   };
 
   const getName = (menu, inputField) => {
-    return inputField.name === "orderItem" ? menu.itemName : inputField.name === "customer" ? menu.customerName : menu.name
+    return inputField.name.includes("orderItem") ? menu.itemName : inputField.name === "customer" ? menu.customerName : menu.name;;
+  }
+
+  const addNewItem = () => {
+    let newFields = [];
+    const localCount = itemCount + 1;
+
+    for (let index = localCount; index <= localCount; index++) {
+      newFields = [
+        ...newFields,
+        {
+          type: "string",
+          fullWidth: true,
+          menuItems: items,
+          variant: "filled",
+          inputType: "select",
+          sx: { gridColumn: "span 2" },
+          name: `orderItem-${index}`,
+          label: `Select Item ${index}`
+        },
+        {
+          type: "number",
+          fullWidth: true,
+          variant: "filled",
+          inputType: "input",
+          name: `price-${index}`,
+          sx: { gridColumn: "span 2" },
+          label: `Price for item ${index}`
+        },
+        {
+          type: "string",
+          fullWidth: true,
+          variant: "filled",
+          inputType: "input",
+          name: `quantity-${index}`,
+          sx: { gridColumn: "span 2" },
+          label: `Quantity for item ${index}`
+        }
+      ]
+    }
+
+    setFormInputFields((prevFields) => [
+      ...prevFields,
+      ...newFields
+    ])
+
+    setItemCount(localCount)
+  }
+  
+  const combineOrderItems = (values) => {
+    const item = [];
+    const price = [];
+    const quantity = [];
+    const localCount = itemCount + 1;
+
+    for (let index = 1; index < localCount; index++) {
+      const orderPrice = values[index === 1 ? 'price' : 'price-'+ index]
+      const orderQuantity = values[index === 1 ? 'quantity' : 'quantity-'+ index]
+      const orderItem = JSON.parse(values[index === 1 ? 'orderItem' : 'orderItem-'+ index])
+    
+      item.push(orderItem)
+      price.push(orderPrice)
+      quantity.push(orderQuantity)
+    }
+
+    return {
+      price,
+      quantity,
+      orderItem: item,
+      customer: values.customer,
+      paymentMethod: values.paymentMethod
+    }
   }
 
   return (
     <Box m="20px">
-      <Header title={title} subtitle={subTitle} />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title={title} subtitle={subTitle} />
+        {source === 'order' ? <Button {...addButton} onClick={addNewItem}>Add New Item</Button> : <></>}
+      </Box>
       <Formik onSubmit={handleFormSubmit} initialValues={initialValues} validationSchema={checkoutSchema}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
           <form onSubmit={handleSubmit}>
@@ -83,7 +165,7 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
               sx={{ "& > div": { gridColumn: isNonMobile ? undefined : "span 4" } }}
             >
               {
-                inputsFields?.map((inputField, index) => (
+                formInputFields?.map((inputField, index) => (
                   inputField?.inputType === "select" ?
                     <TextField
                       select

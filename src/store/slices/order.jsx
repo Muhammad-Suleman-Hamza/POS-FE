@@ -77,7 +77,6 @@ export const orderSlice = createSlice({
         const order = {
           ...data,
           ...JSON.parse(data.customer),
-          ...JSON.parse(data.orderItem),
           ...JSON.parse(data.paymentMethod)
         }
         const updated = [...state?.orders, order];

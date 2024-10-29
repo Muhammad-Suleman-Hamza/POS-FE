@@ -13,9 +13,10 @@ import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/sli
 import {
   addButton,
   editButton,
+  getItemColumns,
   itemFormColumns,
   initialValuesOfItem,
-  checkoutSchemaOfItem
+  checkoutSchemaOfItem,
 } from '../../constants/FormFields'
 
 const Item = () => {
@@ -26,24 +27,15 @@ const Item = () => {
   const { items } = useSelector((state) => state.item);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-  const itemColumns = [
-    { field: 'itemName', headerName: 'Name', width: 200 },
-    { field: 'price', headerName: 'Price', width: 200 },
-    { field: 'weight', headerName: 'Weight', width: 200 },
-    { field: 'dimensions', headerName: 'Dimensions', width: 200 },
-    { field: 'measuringUnit', headerName: 'Measuring Unit', width: 200 },
-    {
-      field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
-        <Box>
-          <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-          <Button {...editButton} onClick={async () => {
-            const result = await dispatch(deleteItem(params.row.pk))
-            if (result.payload.status === 200) toast.warning("Item is deleted.")
-          }}>Delete</Button>
-        </Box>
-      )
-    },
-  ];
+  const itemColumns = getItemColumns(
+    '',
+    (params) => `${params.row.pk}`,
+    (params) => dispatch(saveEntryToBeUpdated(params.row)),
+    async (params) => {
+      const result = await dispatch(deleteItem(params.row.pk))
+      if (result.payload.status === 200) toast.warning("Item is deleted.")
+    }
+  );
 
   useEffect(() => {
     if (items?.length === 0) dispatch(getItems())

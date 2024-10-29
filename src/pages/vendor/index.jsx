@@ -8,7 +8,7 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch,useSelector } from "react-redux";
-import { editButton } from '../../constants/FormFields';
+import { editButton, getVendorColumns } from '../../constants/FormFields';
 import { deleteVendor, getVendors } from "../../store/slices/vendor";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
@@ -26,24 +26,15 @@ const Vendor = () => {
   const { vendors } = useSelector((state) => state.vendor);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-  const vendorColumns = [
-    { field: 'vendorName', headerName: 'Name', width: 200 },
-    { field: 'contact', headerName: 'contact', width: 200 },
-    { field: 'comapny', headerName: 'Comapny', width: 200 },
-    // { field: 'products', headerName: 'Products', width: 200 },
-    { field: 'address', headerName: 'Address', width: 200 },
-    {
-      field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
-        <Box>
-          <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-          <Button {...editButton} onClick={async () => {
-            const result = await dispatch(deleteVendor(params.row.pk))
-            if (result.payload.status === 200) toast.warning("Vendor is deleted.")
-          }}>Delete</Button>
-        </Box>
-      )
-    },
-  ];
+  const vendorColumns = getVendorColumns(
+    '',
+    (params) => `${params.row.pk}`,
+    (params) => dispatch(saveEntryToBeUpdated(params.row)),
+    async (params) => {
+      const result = await dispatch(deleteVendor(params.row.pk))
+      if (result.payload.status === 200) toast.warning("Vendor is deleted.")
+    }
+  );
 
   useEffect(() => {
     if (vendors?.length === 0) dispatch(getVendors())

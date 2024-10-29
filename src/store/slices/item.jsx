@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { endpoints } from '../../constants/apiEndpoints';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
 
 const initialState = {

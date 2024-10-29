@@ -8,7 +8,7 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { editButton } from '../../constants/FormFields';
+import { editButton, getCustomerColumns } from '../../constants/FormFields';
 import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
@@ -26,22 +26,15 @@ const Customer = () => {
   const { customers } = useSelector((state) => state.customer);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-  const customerColumns = [
-    { field: 'customerName', headerName: 'Name', width: 200 },
-    { field: 'contact', headerName: 'Contact', width: 200 },
-    { field: 'address', headerName: 'Address', width: 200 },
-    {
-      field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => (
-        <Box>
-          <Button {...editButton} onClick={() => dispatch(saveEntryToBeUpdated(params.row))}>Edit</Button>
-          <Button {...editButton} onClick={async () => {
-            const result = await dispatch(deleteCustomer(params.row.pk));
-            if (result.payload.status === 200) toast.warning("Customer is deleted.")
-          }}>Delete</Button>
-        </Box>
-      )
-    },
-  ];
+  const customerColumns = getCustomerColumns(
+    '',
+    (params) => `${params.row.pk}`,
+    (params) => dispatch(saveEntryToBeUpdated(params.row)),
+    async (params) => {
+      const result = await dispatch(deleteCustomer(params.row.pk));
+      if (result.payload.status === 200) toast.warning("Customer is deleted.")
+    }
+  );
 
   useEffect(() => {
     if (customers?.length === 0) dispatch(getCustomers())
