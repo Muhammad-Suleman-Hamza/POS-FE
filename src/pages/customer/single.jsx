@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Form from "../../components/Form";
@@ -7,27 +7,33 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { editButton, getCustomerColumns } from '../../constants/FormFields';
-import { getCustomers, deleteCustomer } from "../../store/slices/customer";
+import { deleteCustomer } from "../../store/slices/customer";
 import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
+  backButton, 
+  editButton, 
+  getCustomerColumns,
   customerFormColumns,
   initialValuesOfCustomer,
   checkoutSchemaOfCustomer
 } from '../../constants/FormFields'
 
-const Customer = () => {
+const SingleCustomer = () => {
   const theme = useTheme();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const colors = tokens(theme.palette.mode);
+
+  const [customer, setCustomer] = useState([]);
 
   const { customers } = useSelector((state) => state.customer);
   const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
   const customerColumns = getCustomerColumns(
-    '',
+    'single',
     (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
     async (params) => {
@@ -37,15 +43,15 @@ const Customer = () => {
   );
 
   useEffect(() => {
-    if (customers?.length === 0) dispatch(getCustomers())
+    if (id && !customer.length) setCustomer(customers.filter((customer) => customer.pk === id));
     return () => dispatch(toggleCreateOrUpdateModal())
-  }, [])
+  }, []);
 
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Customers" subtitle="" />
-        <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Customer</Button>
+        <Header title={`Customers: ${id}`} subtitle="" />
+        <Button {...backButton}><Link to={'/items'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -77,7 +83,7 @@ const Customer = () => {
         }}
       >
         <DataGrid
-          rows={customers}
+          rows={customer}
           unstable_rowSpanning
           showCellVerticalBorder
           showColumnVerticalBorder
@@ -105,4 +111,4 @@ const Customer = () => {
   );
 };
 
-export default Customer;
+export default SingleCustomer;

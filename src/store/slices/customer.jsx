@@ -51,9 +51,6 @@ export const customerSlice = createSlice({
   name: 'customer',
   initialState,
   reducers: {
-    customerToBeDeleted: (state, { payload }) => {
-      state.customers = state.customers.filter((customer) => customer.id !== payload.id);;
-    },
   },
   extraReducers: builder => {
     builder

@@ -29,11 +29,14 @@ const Order = () => {
 
   const formColumns = getOrderFormFields(items, customers);
   const orderColumns = getOrderColumns(
+    '',
+    (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
     async (params) => {
       const result = await dispatch(deleteOrder(params.row.pk))
       if (result.payload.status === 200) toast.warning("Order is deleted.")
-  });
+    }
+  );
 
   useEffect(() => {
     if (orders?.length === 0) dispatch(getOrders())
@@ -75,7 +78,15 @@ const Order = () => {
           },
         }}
       >
-        <DataGrid rows={orders} columns={orderColumns} getRowId={(row) => row.pk} />
+        <DataGrid
+          rows={orders}
+          unstable_rowSpanning
+          columns={orderColumns}
+          showCellVerticalBorder
+          showColumnVerticalBorder
+          disableRowSelectionOnClick
+          getRowId={(row) => row.pk}
+        />
 
         <BasicModal
           handleClose={() => dispatch(toggleCreateOrUpdateModal())}
