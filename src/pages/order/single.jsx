@@ -48,23 +48,23 @@ const SingleOrder = () => {
     const formatOrders = () => {
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, orderItem, customerPK, createdDate, customerName, paymentMethodPK, paymentMethodName } = localOrder;
+        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             newOrderStructure.push({
-                customerPK,
-                id: index + 1,
+                customer,
                 createdDate,
-                customerName,
-                paymentMethodPK,
-                paymentMethodName,
+                id: index + 1,
+                paymentMethod,
                 price: price[index],
                 quantity: quantity[index],
-                orderItem: index === 0 ? orderItem[index].orderItemName : orderItem[index][`orderItem-${index + 1}Name`],
+                orderItem: orderItem[index],
             })
         }
         setOrder(newOrderStructure);
     }
+
+    console.log('order :: ', order);
 
     useEffect(() => {
         if (id && !order.length) formatOrders()

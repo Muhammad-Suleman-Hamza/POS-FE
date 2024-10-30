@@ -100,9 +100,9 @@ export const checkoutSchemaOfOrder = yup.object().shape({
 export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'pk', headerName: 'ID', width: 200 },
-        { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName},
         { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
+        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name},
     ];
 
     if (source !== 'single') {
@@ -111,15 +111,15 @@ export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) =>
     return columns;
 }
 
-export const getSingleOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
+export const getSingleOrderColumns = () => {
     const columns = [
         { field: 'id', headerName: 'ID', width: 200 },
-        { field: 'orderItem', headerName: 'Item', width: 200 },
+        { field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem.itemName},
         { field: 'price', headerName: 'Price', width: 200 },
         { field: 'quantity', headerName: 'Quantity', width: 200 },
-        { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName},
         { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
+        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name},
     ];
 
     return columns;
