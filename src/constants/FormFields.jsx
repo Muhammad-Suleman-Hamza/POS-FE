@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { Box } from '@mui/material';
+import { Box, MenuItem, Select } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { paymentMethods } from './generic';
@@ -100,31 +100,14 @@ export const checkoutSchemaOfOrder = yup.object().shape({
 export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'pk', headerName: 'ID', width: 200 },
-        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName},
+        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName },
         { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name},
-    ];
-
-    if (source !== 'single') {
-        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
-    }
-    return columns;
-}
-
-export const getSingleOrderColumns = () => {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 200 },
-        { field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem.itemName},
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'quantity', headerName: 'Quantity', width: 200 },
-        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName},
-        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name},
+        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name },
+        { field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
     ];
 
     return columns;
 }
-
 
 export const getOrderFormFields = (items, customers) => {
     return [
@@ -357,6 +340,7 @@ export const addButton = {
     buttonsource: 'add',
     variant: "contained",
     sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
 }
 
 export const editButton = {
@@ -380,6 +364,16 @@ export const viewButton = {
     anchorsx: { color: "black", textDecoration: "none" }
 }
 
+export const deleteButton = {
+    title: "Edit",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'edit',
+    variant: "contained",
+    style: { marginLeft: 16 },
+    sx: { gridColumn: "span 4" }
+}
+
 export const backButton = {
     title: "Back",
     type: "button",
@@ -391,12 +385,12 @@ export const backButton = {
     anchorsx: { color: "black", textDecoration: "none" }
 }
 
-export const getRowButtons = (params, redirect, editOnClick, deleteOnClick) => {
+export const getRowButtons = (params, redirect = undefined, editOnClick = undefined, deleteOnClick = undefined) => {
     return (
         <Box>
-            <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>
-            <Button {...editButton} onClick={() => deleteOnClick(params)}>Delete</Button>
-            <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>
+            {editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
+            {deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
+            {redirect && <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>}
         </Box>
     )
 }

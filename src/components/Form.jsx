@@ -78,6 +78,8 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
   };
 
   const getName = (menu, inputField) => {
+    console.log('menu :: ', menu);
+    console.log('inputField :: ', inputField);
     return inputField.name.includes("orderItem") ? menu.itemName : inputField.name === "customer" ? menu.customerName : menu.name;;
   }
 
@@ -129,7 +131,7 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     setFormInitialValues(prevValues => ({
       ...prevValues,
       itemCount: localCount
-  }));
+    }));
   }
 
   const combineOrderAttributes = (values) => {
@@ -163,9 +165,7 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
 
   const getInputValue = (values, name) => {
     let value = values[name];
-
     if (name === 'customer' || name === 'paymentMethod') value = values[name].pk;
-
     return value;
   }
 
