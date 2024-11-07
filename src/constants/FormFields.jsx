@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { Box, MenuItem, Select } from '@mui/material';
+import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { paymentMethods } from './generic';
@@ -108,6 +108,21 @@ export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) =>
 
     return columns;
 }
+
+export const getSingleOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 200 },
+        { field: 'orderItem', headerName: 'Item', width: 200 },
+        { field: 'price', headerName: 'Price', width: 200 },
+        { field: 'quantity', headerName: 'Quantity', width: 200 },
+        { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
+        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
+    ];
+
+    return columns;
+}
+
 
 export const getOrderFormFields = (items, customers) => {
     return [
