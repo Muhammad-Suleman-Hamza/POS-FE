@@ -167,6 +167,18 @@ export const getOrderFormFields = (items, customers) => {
     ];
 }
 
+export const getEmptyOrder = () => {
+    return {
+        id: 1,
+        price: undefined,
+        quantity: undefined,
+        customer: undefined,
+        orderItem: undefined,
+        createdDate: undefined,
+        paymentMethod: undefined,
+    }
+}
+
 // Customer
 
 export const initialValuesOfCustomer = {

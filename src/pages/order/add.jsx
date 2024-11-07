@@ -1,66 +1,51 @@
+import { useState } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
-import { updateOrder } from "../../store/slices/order";
+import { addOrder } from "../../store/slices/order";
 import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
 import { Box, MenuItem, TextField, useTheme } from "@mui/material";
-import { backButton, editButton } from '../../constants/FormFields'
+import { backButton, editButton, getEmptyOrder } from '../../constants/FormFields'
 
 const AddOrder = () => {
     const theme = useTheme();
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const colors = tokens(theme.palette.mode);
 
     const { items } = useSelector((state) => state.item);
-    const { orders } = useSelector((state) => state.order);
     const { customers } = useSelector((state) => state.customer);
 
-    const [order, setOrder] = useState([]);
-    const [editable, setEditable] = useState(false);
-    const [updatedOrder, setUpdatedOrder] = useState({});
+    const [order, setOrder] = useState([getEmptyOrder()]);
 
-    const formatOrders = () => {
-        const newOrderStructure = [];
-        const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
-
-        for (let index = 0; index < orderItem.length; index++) {
-
-            newOrderStructure.push({
-                customer,
-                createdDate,
-                paymentMethod,
-                id: index + 1,
-                price: price[index],
-                quantity: quantity[index],
-                orderItem: orderItem[index],
-            })
-
-            setUpdatedOrder(localOrder);
-            setOrder(newOrderStructure);
-        }
-    }
+    const [updatedOrder, setUpdatedOrder] = useState({
+        price: [],
+        customer: {},
+        quantity: [],
+        orderItem: [],
+        createdDate: "",
+        paymentMethod: {},
+    });
 
     const addNewItemInOrder = () => {
         const { customer, createdDate, paymentMethod } = updatedOrder;
         const newOrder = {
-            price: 0,
             customer,
             createdDate,
-            quantity: 0,
             orderItem: '',
             paymentMethod,
-            id: order.length + 1,
+            price: undefined,
+            quantity: undefined,
+            id: order.length + 1
         };
 
         setOrder((currentOrder) => [...currentOrder, newOrder])
-        setUpdatedOrder(prevValues => ({ ...prevValues, orderItem: [...updatedOrder.orderItem, newOrder] }));
     }
 
     const handleChange = (event, params = undefined) => {
@@ -78,7 +63,8 @@ const AddOrder = () => {
 
             const updatedOrderItems = updatedOrder?.orderItem;
             updatedOrderItems[params.id-1] = newItem;
-
+            
+            setOrder(result);
             setUpdatedOrder(prevValues => ({ ...prevValues, [name]: updatedOrderItems }));
         }
         else if (name === 'price') {
@@ -97,12 +83,9 @@ const AddOrder = () => {
         else return;
 
         if (result) {
-            if (name === 'orderItem') {
-                setOrder(result);
-            }
-            else {
+            if (name !== 'orderItem') {
                 const updatedProp = [...order];
-                if(name === 'customer' || name === 'paymentMethod') updatedProp[params.id - 1][name] = result;
+                if (name === 'customer' || name === 'paymentMethod') updatedProp[params.id - 1][name] = result;
                 else updatedProp[params.id - 1][name] = result[params.id - 1];
                 setOrder(updatedProp);
                 setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
@@ -117,29 +100,20 @@ const AddOrder = () => {
                 field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
                 renderCell: (params) => {
                     return (
-                        <>
+                        <TextField
+                            select
+                            fullWidth
+                            type="string"
+                            name="orderItem"
+                            onChange={(e) => handleChange(e, params)}
+                            value={order[params.id - 1]?.orderItem?.pk}
+                        >
                             {
-                                editable ?
-                                    <TextField
-                                        select
-                                        fullWidth
-                                        type="string"
-                                        name="orderItem"
-                                        onChange={(e) => handleChange(e, params)}
-                                        value={order[params.id - 1]?.orderItem?.pk}
-                                    >
-                                        {
-                                            items?.map((item) => (
-                                                <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
-                                            ))
-                                        }
-                                    </TextField>
-                                    :
-                                    <>
-                                        {order[params.id - 1]?.orderItem?.itemName}
-                                    </>
+                                items?.map((item) => (
+                                    <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
+                                ))
                             }
-                        </>
+                        </TextField>
                     );
                 }
             },
@@ -147,22 +121,13 @@ const AddOrder = () => {
                 field: 'price', headerName: 'Price', width: 200,
                 renderCell: (params) => {
                     return (
-                        <>
-                            {
-                                editable ?
-                                    <TextField
-                                        fullWidth
-                                        name="price"
-                                        type="number"
-                                        value={order[params.id - 1]?.price}
-                                        onChange={(e) => handleChange(e, params)}
-                                    />
-                                    :
-                                    <>
-                                        {order[params.id - 1]?.price}
-                                    </>
-                            }
-                        </>
+                        <TextField
+                            fullWidth
+                            name="price"
+                            type="number"
+                            value={order[params.id - 1]?.price}
+                            onChange={(e) => handleChange(e, params)}
+                        />
                     );
                 }
             },
@@ -170,22 +135,13 @@ const AddOrder = () => {
                 field: 'quantity', headerName: 'Quantity', width: 200,
                 renderCell: (params) => {
                     return (
-                        <>
-                            {
-                                editable ?
-                                    <TextField
-                                        fullWidth
-                                        type="number"
-                                        name="quantity"
-                                        value={order[params.id - 1]?.quantity}
-                                        onChange={(e) => handleChange(e, params)}
-                                    />
-                                    :
-                                    <>
-                                        {order[params.id - 1]?.quantity}
-                                    </>
-                            }
-                        </>
+                        <TextField
+                            fullWidth
+                            type="number"
+                            name="quantity"
+                            value={order[params.id - 1]?.quantity}
+                            onChange={(e) => handleChange(e, params)}
+                        />
                     );
                 }
             },
@@ -193,29 +149,20 @@ const AddOrder = () => {
                 field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
                 renderCell: (params) => {
                     return (
-                        <>
+                        params.id === 1 && <TextField
+                            select
+                            fullWidth
+                            type="string"
+                            name="customer"
+                            onChange={(e) => handleChange(e, params)}
+                            value={order[params.id - 1]?.customer?.pk}
+                        >
                             {
-                                editable && params.id === 1 ?
-                                    <TextField
-                                        select
-                                        fullWidth
-                                        type="string"
-                                        name="customer"
-                                        onChange={(e) => handleChange(e, params)}
-                                        value={order[params.id - 1]?.customer?.pk}
-                                    >
-                                        {
-                                            customers?.map((customer) => (
-                                                <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
-                                            ))
-                                        }
-                                    </TextField>
-                                    :
-                                    <>
-                                        {params.id === 1 && order[params.id - 1]?.customer?.customerName}
-                                    </>
+                                customers?.map((customer) => (
+                                    <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
+                                ))
                             }
-                        </>
+                        </TextField>
                     );
                 }
             },
@@ -223,22 +170,13 @@ const AddOrder = () => {
                 field: 'createdDate', headerName: 'Purchase Date', width: 200,
                 renderCell: (params) => {
                     return (
-                        <>
-                            {
-                                editable && params.id === 1 ?
-                                    <TextField
-                                        fullWidth
-                                        type="date"
-                                        name="createdDate"
-                                        value={order[params.id - 1]?.createdDate}
-                                        onChange={(e) => handleChange(e, params)}
-                                    />
-                                    :
-                                    <>
-                                        {params.id === 1 && order[params.id - 1]?.createdDate}
-                                    </>
-                            }
-                        </>
+                        params.id === 1 && <TextField
+                            fullWidth
+                            type="date"
+                            name="createdDate"
+                            value={order[params.id - 1]?.createdDate}
+                            onChange={(e) => handleChange(e, params)}
+                        />
                     );
                 }
             },
@@ -246,29 +184,20 @@ const AddOrder = () => {
                 field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
                 renderCell: (params) => {
                     return (
-                        <>
+                        params.id === 1 && <TextField
+                            select
+                            fullWidth
+                            type="string"
+                            name="paymentMethod"
+                            onChange={(e) => handleChange(e, params)}
+                            value={order[params.id - 1]?.paymentMethod?.pk}
+                        >
                             {
-                                editable && params.id === 1 ?
-                                    <TextField
-                                        select
-                                        fullWidth
-                                        type="string"
-                                        name="paymentMethod"
-                                        onChange={(e) => handleChange(e, params)}
-                                        value={order[params.id - 1]?.paymentMethod?.pk}
-                                    >
-                                        {
-                                            paymentMethods?.map((paymentMethod) => (
-                                                <MenuItem key={paymentMethod.pk} value={paymentMethod.pk}>{paymentMethod.name}</MenuItem>
-                                            ))
-                                        }
-                                    </TextField>
-                                    :
-                                    <>
-                                        {params.id === 1 && order[params.id - 1]?.paymentMethod?.pk}
-                                    </>
+                                paymentMethods?.map((paymentMethod) => (
+                                    <MenuItem key={paymentMethod.pk} value={paymentMethod.pk}>{paymentMethod.name}</MenuItem>
+                                ))
                             }
-                        </>
+                        </TextField>
                     );
                 }
             },
@@ -277,34 +206,34 @@ const AddOrder = () => {
         return columns;
     }
 
-    const handleUpdateOrder = async () => {
-        const result = await dispatch(updateOrder(updatedOrder));
+    const handleAddOrder = async () => {
+        const result = await dispatch(addOrder(updatedOrder));
         console.log(result)
 
-        if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
-        else if (result.payload.status === 200) {
-            toast.success("Order is updated.");
-            setEditable(!editable);
-        }
+        setOrder([getEmptyOrder()]);
+        setUpdatedOrder({});
 
+        if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
+        else if (result.payload.status === 200) {
+            toast.success("Order is added.");
+
+            setTimeout(() => {
+                navigate("/orders"); 
+            }, 2000);
+        }
     }
 
     console.log('order :: ', order);
     console.log('updatedOrder :: ', updatedOrder);
 
-    useEffect(() => {
-        if (id && !order.length) formatOrders()
-    }, []);
-
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={`Order: ${id}`} subtitle="" />
+                <Header title={`Add Order`} subtitle="" />
                 <Box>
-                    <Button {...editButton} onClick={() => setEditable(!editable)}>{editable ? 'Cancel' : 'Edit'}</Button>
-                    {editable && <Button {...editButton} onClick={handleUpdateOrder}>Save</Button>}
-                    {editable && <Button {...editButton} onClick={addNewItemInOrder}>Add item</Button>}
-                    {!editable && <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>}
+                    {Object.keys(updatedOrder).length ? <Button {...editButton} onClick={handleAddOrder}>Save</Button> : <></>}
+                    <Button {...editButton} onClick={addNewItemInOrder}>Add item</Button>
+                    <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                 </Box>
             </Box>
             <Box
