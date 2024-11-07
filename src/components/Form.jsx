@@ -1,8 +1,9 @@
 import Header from "./Header";
 import { Formik } from "formik";
 import { toast } from 'react-toastify';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { addButton } from '../constants/FormFields';
+import { paymentMethods } from "../constants/generic";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem, updateItem } from '../store/slices/item';
 import { addOrder, updateOrder } from '../store/slices/order';
@@ -14,11 +15,13 @@ import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
 const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  
+
   const { items } = useSelector((state) => state.item);
+  const { customers } = useSelector((state) => state.customer);
 
   const [itemCount, setItemCount] = useState(1);
   const [formInputFields, setFormInputFields] = useState(inputsFields);
+  const [formInitialValues, setFormInitialValues] = useState(initialValues);
 
   const handleFormSubmit = async (values) => {
     console.log('values :: ', values);
@@ -26,7 +29,7 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     let toastText = undefined;
     let result = undefined;
 
-    if (source === 'order' && itemCount > 1) values = combineOrderItems(values);
+    if (source === 'order') values = combineOrderAttributes(values);
 
     if (button.buttonsource === 'add') {
       if (source === 'item') {
@@ -75,14 +78,17 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
   };
 
   const getName = (menu, inputField) => {
+    console.log('menu :: ', menu);
+    console.log('inputField :: ', inputField);
     return inputField.name.includes("orderItem") ? menu.itemName : inputField.name === "customer" ? menu.customerName : menu.name;;
   }
 
-  const addNewItem = () => {
+  const addNewItem = (count) => {
     let newFields = [];
-    const localCount = itemCount + 1;
+    const localCount = count + 1;
+    const initalCount = source === 'order' && button.buttonsource === 'edit' ? 2 : count + 1;
 
-    for (let index = localCount; index <= localCount; index++) {
+    for (let index = initalCount; index <= localCount; index++) {
       newFields = [
         ...newFields,
         {
@@ -122,40 +128,63 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     ])
 
     setItemCount(localCount)
+    setFormInitialValues(prevValues => ({
+      ...prevValues,
+      itemCount: localCount
+    }));
   }
-  
-  const combineOrderItems = (values) => {
+
+  const combineOrderAttributes = (values) => {
     const item = [];
     const price = [];
     const quantity = [];
     const localCount = itemCount + 1;
+    const customer = customers.find((customer) => customer.pk === values.customer);
+    const paymentMethod = paymentMethods.find((paymentMethod) => paymentMethod.pk === values.paymentMethod);
 
     for (let index = 1; index < localCount; index++) {
-      const orderPrice = values[index === 1 ? 'price' : 'price-'+ index]
-      const orderQuantity = values[index === 1 ? 'quantity' : 'quantity-'+ index]
-      const orderItem = JSON.parse(values[index === 1 ? 'orderItem' : 'orderItem-'+ index])
-    
-      item.push(orderItem)
-      price.push(orderPrice)
-      quantity.push(orderQuantity)
+      const itemPK = values[index === 1 ? 'orderItem' : 'orderItem-' + index];
+      const itemObj = items.find((item) => item.pk === itemPK);
+
+      const orderPrice = values[index === 1 ? 'price' : 'price-' + index];
+      const orderQuantity = values[index === 1 ? 'quantity' : 'quantity-' + index];
+
+      item.push(itemObj);
+      price.push(orderPrice);
+      quantity.push(orderQuantity);
     }
 
     return {
       price,
       quantity,
+      customer,
+      paymentMethod,
       orderItem: item,
-      customer: values.customer,
-      paymentMethod: values.paymentMethod
     }
   }
+
+  const getInputValue = (values, name) => {
+    let value = values[name];
+    if (name === 'customer' || name === 'paymentMethod') value = values[name].pk;
+    return value;
+  }
+
+  console.log('formInitialValues :: ', formInitialValues);
 
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={title} subtitle={subTitle} />
-        {source === 'order' ? <Button {...addButton} onClick={addNewItem}>Add new order item</Button> : <></>}
+        {
+          source === 'order' ?
+            <Button {...addButton} onClick={() => addNewItem(button.buttonsource === 'edit' ? formInitialValues['itemCount'] : itemCount)}>
+              Add new order item
+            </Button>
+            :
+            <></>
+        }
       </Box>
-      <Formik onSubmit={handleFormSubmit} initialValues={initialValues} validationSchema={checkoutSchema}>
+      <Formik onSubmit={handleFormSubmit} initialValues={formInitialValues} validationSchema={checkoutSchema}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <Box
@@ -178,19 +207,13 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
                       variant={inputField.variant}
                       key={index + inputField.name}
                       required={inputField.required}
-                      value={values[inputField.name]}
+                      value={getInputValue(values, inputField.name)}
                       error={!!touched[inputField.name] && !!errors[inputField.name]}
                       helperText={touched[inputField.name] && errors[inputField.name]}
                     >
                       {
                         inputField?.menuItems.map((menu) =>
-                          <MenuItem
-                            key={menu.pk}
-                            value={JSON.stringify({
-                              [`${inputField.name}PK`]: menu.pk,
-                              [`${inputField.name}Name`]: getName(menu, inputField)
-                            })}
-                          >
+                          <MenuItem key={menu.pk} value={menu.pk}>
                             {getName(menu, inputField)}
                           </MenuItem>
                         )

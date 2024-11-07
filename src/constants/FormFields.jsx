@@ -100,14 +100,12 @@ export const checkoutSchemaOfOrder = yup.object().shape({
 export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'pk', headerName: 'ID', width: 200 },
-        { field: 'customerName', headerName: 'Customer', width: 200 },
+        { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName },
         { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
+        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name },
+        { field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
     ];
 
-    if (source !== 'single') {
-        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
-    }
     return columns;
 }
 
@@ -182,6 +180,18 @@ export const getOrderFormFields = (items, customers) => {
             sx: { gridColumn: "span 2" }
         }
     ];
+}
+
+export const getEmptyOrder = () => {
+    return {
+        id: 1,
+        price: undefined,
+        quantity: undefined,
+        customer: undefined,
+        orderItem: undefined,
+        createdDate: undefined,
+        paymentMethod: undefined,
+    }
 }
 
 // Customer
@@ -357,6 +367,7 @@ export const addButton = {
     buttonsource: 'add',
     variant: "contained",
     sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
 }
 
 export const editButton = {
@@ -380,6 +391,16 @@ export const viewButton = {
     anchorsx: { color: "black", textDecoration: "none" }
 }
 
+export const deleteButton = {
+    title: "Edit",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'edit',
+    variant: "contained",
+    style: { marginLeft: 16 },
+    sx: { gridColumn: "span 4" }
+}
+
 export const backButton = {
     title: "Back",
     type: "button",
@@ -391,12 +412,12 @@ export const backButton = {
     anchorsx: { color: "black", textDecoration: "none" }
 }
 
-export const getRowButtons = (params, redirect, editOnClick, deleteOnClick) => {
+export const getRowButtons = (params, redirect = undefined, editOnClick = undefined, deleteOnClick = undefined) => {
     return (
         <Box>
-            <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>
-            <Button {...editButton} onClick={() => deleteOnClick(params)}>Delete</Button>
-            <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>
+            {editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
+            {deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
+            {redirect && <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>}
         </Box>
     )
 }

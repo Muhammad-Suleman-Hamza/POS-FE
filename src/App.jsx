@@ -5,10 +5,11 @@ import Vendor from "./pages/vendor";
 import Profile from "./pages/profile";
 import Toast from "./components/Toast";
 import Customer from "./pages/customer";
+import AddOrder from "./pages/order/add";
 import Dashboard from "./pages/dashboard";
 import Topbar from "./pages/global/Topbar";
+import ViewOrder from "./pages/order/view";
 import SingleItem from "./pages/item/single";
-import SingleOrder from "./pages/order/single";
 import { Route, Routes } from "react-router-dom";
 import SingleVendor from "./pages/vendor/single";
 import { ColorModeContext, useMode } from "./theme";
@@ -39,9 +40,10 @@ const App = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/customers" element={<Customer />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/orders/add" element={<AddOrder />} />
                   <Route path="/items/:id" element={<SingleItem />} />
-                  <Route path="/orders/:id" element={<SingleOrder />} />
                   <Route path="/vendors/:id" element={<SingleVendor />} />
+                  <Route path="/orders/view/:id" element={<ViewOrder />} />
                   <Route path="/customers/:id" element={<SingleCustomer />} />
 
 

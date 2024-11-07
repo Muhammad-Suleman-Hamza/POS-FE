@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
+import { Link } from "react-router-dom";
 import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
@@ -9,8 +10,8 @@ import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteOrder, getOrders } from "../../store/slices/order";
+import { toggleCreateOrUpdateModal } from "../../store/slices/common";
 import { editButton, getOrderColumns, getOrderFormFields } from '../../constants/FormFields';
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
 import {
   addButton,
   initialValuesOfOrder,
@@ -30,8 +31,8 @@ const Order = () => {
   const formColumns = getOrderFormFields(items, customers);
   const orderColumns = getOrderColumns(
     '',
-    (params) => `${params.row.pk}`,
-    (params) => dispatch(saveEntryToBeUpdated(params.row)),
+    (params) => `view/${params.row.pk}`,
+    undefined,
     async (params) => {
       const result = await dispatch(deleteOrder(params.row.pk))
       if (result.payload.status === 200) toast.warning("Order is deleted.")
@@ -39,7 +40,8 @@ const Order = () => {
   );
 
   useEffect(() => {
-    if (orders?.length === 0) dispatch(getOrders())
+    if (orders?.length === 0) dispatch(getOrders());
+
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 
@@ -47,7 +49,7 @@ const Order = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Orders" subtitle="" />
-        <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Order</Button>
+        <Button {...addButton}><Link to={'add'} style={{ ...addButton.anchorsx }}>Add Order</Link></Button>
       </Box>
       <Box
         m="8px 0 0 0"

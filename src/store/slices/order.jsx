@@ -61,39 +61,19 @@ export const orderSlice = createSlice({
         state.orders = state.orders;
       })
       .addCase(getOrders.fulfilled, (state, { payload: { data } }) => {
-        const orders = data.map((order) => {
-          return {
-            ...order,
-            ...JSON.parse(order.customer),
-            ...JSON.parse(order.orderItem),
-            ...JSON.parse(order.paymentMethod)
-          }
-        })
-
-        state.orders = orders;
-        setLocalStorage('orders', orders);
+        state.orders = data;
+        setLocalStorage('orders', data);
       })
       .addCase(addOrder.fulfilled, (state, { payload: { data } }) => {
-        const order = {
-          ...data,
-          ...JSON.parse(data.customer),
-          ...JSON.parse(data.paymentMethod)
-        }
-        const updated = [...state?.orders, order];
+        const updated = [...state?.orders, data];
 
         state.orders = updated;
         setLocalStorage('orders', updated);
       })
       .addCase(updateOrder.fulfilled, (state, { payload: { data } }) => {
-        const order = {
-          ...data,
-          ...JSON.parse(data.customer),
-          ...JSON.parse(data.orderItem),
-          ...JSON.parse(data.paymentMethod)
-        }
-        const index = state.orders.findIndex(item => item.pk == order.pk);
+        const index = state.orders.findIndex(item => item.pk == data.pk);
 
-        state.orders[index] = order;
+        state.orders[index] = data;
         setLocalStorage('orders', state.orders);
       })
       .addCase(deleteOrder.fulfilled, (state, { payload: { data } }) => {
