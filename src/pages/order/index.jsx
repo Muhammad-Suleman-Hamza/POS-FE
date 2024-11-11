@@ -2,33 +2,21 @@ import { useEffect } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import { Link } from "react-router-dom";
-import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
-import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteOrder, getOrders } from "../../store/slices/order";
-import { toggleCreateOrUpdateModal } from "../../store/slices/common";
-import { editButton, getOrderColumns, getOrderFormFields } from '../../constants/FormFields';
-import {
-  addButton,
-  initialValuesOfOrder,
-  checkoutSchemaOfOrder
-} from '../../constants/FormFields'
+import { addButton, getOrderColumns } from '../../constants/FormFields';
 
 const Order = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const colors = tokens(theme.palette.mode);
 
-  const { items } = useSelector((state) => state.item);
   const { orders } = useSelector((state) => state.order);
-  const { customers } = useSelector((state) => state.customer);
-  const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-  const formColumns = getOrderFormFields(items, customers);
   const orderColumns = getOrderColumns(
     '',
     (params) => `view/${params.row.pk}`,
@@ -41,8 +29,6 @@ const Order = () => {
 
   useEffect(() => {
     if (orders?.length === 0) dispatch(getOrders());
-
-    return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 
   return (
@@ -89,21 +75,6 @@ const Order = () => {
           disableRowSelectionOnClick
           getRowId={(row) => row.pk}
         />
-
-        <BasicModal
-          handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
-        >
-          <Form
-            subtitle=""
-            source='order'
-            inputsFields={formColumns}
-            checkoutSchema={checkoutSchemaOfOrder}
-            button={showCreateOrUpdateModal.create ? addButton : editButton}
-            title={showCreateOrUpdateModal.create ? "Create Order" : "Update Order"}
-            initialValues={showCreateOrUpdateModal.create ? initialValuesOfOrder : entryToBeUpdateOrDelete}
-          />
-        </BasicModal>
       </Box>
     </Box>
   );

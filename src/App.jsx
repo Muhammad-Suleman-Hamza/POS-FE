@@ -8,7 +8,7 @@ import Customer from "./pages/customer";
 import AddOrder from "./pages/order/add";
 import Dashboard from "./pages/dashboard";
 import Topbar from "./pages/global/Topbar";
-import ViewOrder from "./pages/order/view";
+import ViewOrder from "./pages/order/edit";
 import SingleItem from "./pages/item/single";
 import { Route, Routes } from "react-router-dom";
 import SingleVendor from "./pages/vendor/single";

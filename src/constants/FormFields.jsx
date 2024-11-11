@@ -189,8 +189,8 @@ export const getEmptyOrder = () => {
         quantity: undefined,
         customer: undefined,
         orderItem: undefined,
-        createdDate: undefined,
-        paymentMethod: undefined,
+        TotalPrice: undefined,
+        paymentMethod: undefined
     }
 }
 

@@ -11,17 +11,18 @@ import { useTheme, Box, Typography, IconButton } from "@mui/material";
 import SwitchLeftOutlinedIcon from "@mui/icons-material/SwitchLeftOutlined";
 import SwitchRightOutlinedIcon from "@mui/icons-material/SwitchRightOutlined";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ to, key, icon, title, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
     <MenuItem
-      active={selected === title}
-      style={{ color: colors.grey[100] }}
-      onClick={() => setSelected(title)}
+      key={key}
       icon={icon}
+      active={selected === title}
       routerLink={<Link to={to} />}
+      onClick={() => setSelected(title)}
+      style={{ color: colors.grey[100] }}
     >
       <Typography>{title}</Typography>
     </MenuItem>

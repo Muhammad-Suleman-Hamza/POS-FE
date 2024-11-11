@@ -40,6 +40,7 @@ const ViewOrder = () => {
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
+                totalPrice: price[index] * quantity[index]
             })
 
             setUpdatedOrder(localOrder);
@@ -57,6 +58,7 @@ const ViewOrder = () => {
             orderItem: '',
             paymentMethod,
             id: order.length + 1,
+            totalPrice: undcefined
         };
 
         setOrder((currentOrder) => [...currentOrder, newOrder])
@@ -72,41 +74,68 @@ const ViewOrder = () => {
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
             const newItem = { ...items.find((order) => order.pk === value) };
+
             newItem['id'] = params.id;
+            newOrderItems[params.id - 1]['quantity'] = 0;
             newOrderItems[params.id - 1]['orderItem'] = newItem;
+            newOrderItems[params.id - 1]['price'] = Number(newItem?.price);
+            newOrderItems[params.id - 1]['totalPrice'] = Number(newItem?.price) * newOrderItems[params.id - 1]?.quantity || 0;
+
             result = newOrderItems;
 
+            const updatedOrderPrices = updatedOrder?.price;
             const updatedOrderItems = updatedOrder?.orderItem;
-            updatedOrderItems[params.id-1] = newItem;
 
-            setUpdatedOrder(prevValues => ({ ...prevValues, [name]: updatedOrderItems }));
+            updatedOrderItems[params.id - 1] = newItem;
+            updatedOrderPrices[params.id - 1] = newItem?.price;
+
+            setOrder(result);
+            setUpdatedOrder(prevValues => ({
+                ...prevValues,
+                price: updatedOrderPrices,
+                orderItem: updatedOrderItems
+            }));
         }
         else if (name === 'price') {
             const newOrderItemsPrice = [...updatedOrder.price];
-            newOrderItemsPrice[params.id - 1] = value;
+            newOrderItemsPrice[params.id - 1] = Number(value);
             result = newOrderItemsPrice;
         }
         else if (name === 'quantity') {
             const newOrderItemsQuantity = [...updatedOrder.quantity];
-            newOrderItemsQuantity[params.id - 1] = value;
+            newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
         }
-        else if (name === 'createdDate') {
-            result = value;
-        }
+        else if (name === 'createdDate') result = value;
+        else if (name === 'totalPrice') result = Number(value);
         else return;
 
-        if (result) {
-            if (name === 'orderItem') {
-                setOrder(result);
+        if (name !== 'orderItem' && result) {
+            const orderUpdated = [...order];
+            if (name === 'customer' || name === 'paymentMethod') orderUpdated[params.id - 1][name] = result;
+            else orderUpdated[params.id - 1][name] = result[params.id - 1];
+
+            if (name === 'quantity') {
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value) * updatedOrder['price'][params.id - 1] || 0
             }
-            else {
-                const updatedProp = [...order];
-                if(name === 'customer' || name === 'paymentMethod') updatedProp[params.id - 1][name] = result;
-                else updatedProp[params.id - 1][name] = result[params.id - 1];
-                setOrder(updatedProp);
-                setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
+            else if (name === 'price') {
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value) * updatedOrder['quantity'][params.id - 1] || 0
             }
+            else if (name === 'totalPrice') {
+                const newOrderItemsPrice = [...updatedOrder.price];
+                const perPiecePrice = Number(value) / updatedOrder['quantity'][params.id - 1] || 0;
+
+                newOrderItemsPrice[params.id - 1] = perPiecePrice;
+                orderUpdated[params.id - 1]['price'] = perPiecePrice;
+
+                setUpdatedOrder(prevValues => ({
+                    ...prevValues,
+                    price: newOrderItemsPrice,
+                }));
+            }
+
+            setOrder(orderUpdated);
+            if (name !== 'totalPrice') setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
         }
     }
 
@@ -144,7 +173,7 @@ const ViewOrder = () => {
                 }
             },
             {
-                field: 'price', headerName: 'Price', width: 200,
+                field: 'price', headerName: 'Single price', width: 200,
                 renderCell: (params) => {
                     return (
                         <>
@@ -183,6 +212,29 @@ const ViewOrder = () => {
                                     :
                                     <>
                                         {order[params.id - 1]?.quantity}
+                                    </>
+                            }
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'totalPrice', headerName: 'Total Price', width: 200,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {
+                                editable ?
+                                    <TextField
+                                        fullWidth
+                                        type="number"
+                                        name="totalPrice"
+                                        value={order[params.id - 1]?.totalPrice}
+                                        onChange={(e) => handleChange(e, params)}
+                                    />
+                                    :
+                                    <>
+                                        {order[params.id - 1]?.totalPrice}
                                     </>
                             }
                         </>
@@ -303,7 +355,7 @@ const ViewOrder = () => {
                 <Box>
                     <Button {...editButton} onClick={() => setEditable(!editable)}>{editable ? 'Cancel' : 'Edit'}</Button>
                     {editable && <Button {...editButton} onClick={handleUpdateOrder}>Save</Button>}
-                    {editable && <Button {...editButton} onClick={addNewItemInOrder}>Add item</Button>}
+                    {editable && <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>}
                     {!editable && <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>}
                 </Box>
             </Box>

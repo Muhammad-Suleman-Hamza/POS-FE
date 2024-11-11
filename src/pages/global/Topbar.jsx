@@ -1,15 +1,17 @@
 import React from "react";
 import { useContext } from "react";
-import { ColorModeContext, tokens } from "../../theme";
-import { useTheme, Box, IconButton, InputBase } from "@mui/material";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import { Link } from "react-router-dom";
 import { useProSidebar } from "react-pro-sidebar";
+import SearchIcon from "@mui/icons-material/Search";
+import { ColorModeContext, tokens } from "../../theme";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import { useTheme, Box, IconButton, InputBase } from "@mui/material";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -18,45 +20,21 @@ const Topbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
-      <Box display="flex">
-        {broken && !rtl && (
-          <IconButton
-            sx={{ margin: "0 6 0 2" }}
-            onClick={() => toggleSidebar()}
-          >
-            <MenuOutlinedIcon />
-          </IconButton>
-        )}
-        <Box
-          display="flex"
-          backgroundColor={colors.primary[400]}
-          p={0.2}
-          borderRadius={1}
-        >
-          <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search" />
-          <IconButton type="button">
-            <SearchIcon />
-          </IconButton>
-        </Box>
-      </Box>
+      <Box display="flex" />
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
-            
-           <LightModeOutlinedIcon />
+
+            <LightModeOutlinedIcon />
           ) : (
             <DarkModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <PersonOutlinedIcon />
-        </IconButton>
+        <Link to={'profile'}>
+          <IconButton>
+            <PersonOutlinedIcon />
+          </IconButton>
+        </Link>
         {broken && rtl && (
           <IconButton
             sx={{ margin: "0 6 0 2" }}
@@ -66,7 +44,7 @@ const Topbar = () => {
           </IconButton>
         )}
       </Box>
-    </Box>
+    </Box >
   );
 };
 

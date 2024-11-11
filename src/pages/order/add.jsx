@@ -4,9 +4,8 @@ import { toast } from 'react-toastify';
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../components/Header";
-import { useNavigate } from "react-router-dom";
-import { Link, useParams } from "react-router-dom";
 import { addOrder } from "../../store/slices/order";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
 import { Box, MenuItem, TextField, useTheme } from "@mui/material";
@@ -14,7 +13,6 @@ import { backButton, editButton, getEmptyOrder } from '../../constants/FormField
 
 const AddOrder = () => {
     const theme = useTheme();
-    const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const colors = tokens(theme.palette.mode);
@@ -29,20 +27,19 @@ const AddOrder = () => {
         customer: {},
         quantity: [],
         orderItem: [],
-        createdDate: "",
-        paymentMethod: {},
+        paymentMethod: {}
     });
 
     const addNewItemInOrder = () => {
-        const { customer, createdDate, paymentMethod } = updatedOrder;
+        const { customer, paymentMethod } = updatedOrder;
         const newOrder = {
             customer,
-            createdDate,
             orderItem: '',
             paymentMethod,
             price: undefined,
             quantity: undefined,
-            id: order.length + 1
+            id: order.length + 1,
+            totalPrice: undcefined
         };
 
         setOrder((currentOrder) => [...currentOrder, newOrder])
@@ -57,39 +54,67 @@ const AddOrder = () => {
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
             const newItem = { ...items.find((order) => order.pk === value) };
+
             newItem['id'] = params.id;
+            newOrderItems[params.id - 1]['quantity'] = 0;
             newOrderItems[params.id - 1]['orderItem'] = newItem;
+            newOrderItems[params.id - 1]['price'] = Number(newItem?.price);
+            newOrderItems[params.id - 1]['totalPrice'] = Number(newItem?.price) * newOrderItems[params.id - 1]?.quantity || 0;
+
             result = newOrderItems;
 
+            const updatedOrderPrices = updatedOrder?.price;
             const updatedOrderItems = updatedOrder?.orderItem;
-            updatedOrderItems[params.id-1] = newItem;
-            
+
+            updatedOrderItems[params.id - 1] = newItem;
+            updatedOrderPrices[params.id - 1] = newItem?.price;
+
             setOrder(result);
-            setUpdatedOrder(prevValues => ({ ...prevValues, [name]: updatedOrderItems }));
+            setUpdatedOrder(prevValues => ({
+                ...prevValues,
+                price: updatedOrderPrices,
+                orderItem: updatedOrderItems
+            }));
         }
         else if (name === 'price') {
             const newOrderItemsPrice = [...updatedOrder.price];
-            newOrderItemsPrice[params.id - 1] = value;
+            newOrderItemsPrice[params.id - 1] = Number(value);
             result = newOrderItemsPrice;
         }
         else if (name === 'quantity') {
             const newOrderItemsQuantity = [...updatedOrder.quantity];
-            newOrderItemsQuantity[params.id - 1] = value;
+            newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
         }
-        else if (name === 'createdDate') {
-            result = value;
-        }
+        else if (name === 'totalPrice') result = Number(value);
         else return;
 
-        if (result) {
-            if (name !== 'orderItem') {
-                const updatedProp = [...order];
-                if (name === 'customer' || name === 'paymentMethod') updatedProp[params.id - 1][name] = result;
-                else updatedProp[params.id - 1][name] = result[params.id - 1];
-                setOrder(updatedProp);
-                setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
+        if (name !== 'orderItem' && result) {
+            const orderUpdated = [...order];
+            if (name === 'customer' || name === 'paymentMethod') orderUpdated[params.id - 1][name] = result;
+            else orderUpdated[params.id - 1][name] = result[params.id - 1];
+
+            if (name === 'quantity') {
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value) * updatedOrder['price'][params.id - 1] || 0
             }
+            else if (name === 'price') {
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value) * updatedOrder['quantity'][params.id - 1] || 0
+            }
+            else if (name === 'totalPrice') {
+                const newOrderItemsPrice = [...updatedOrder.price];
+                const perPiecePrice = Number(value) / updatedOrder['quantity'][params.id - 1] || 0;
+
+                newOrderItemsPrice[params.id - 1] = perPiecePrice;
+                orderUpdated[params.id - 1]['price'] = perPiecePrice;
+
+                setUpdatedOrder(prevValues => ({
+                    ...prevValues,
+                    price: newOrderItemsPrice,
+                }));
+            }
+
+            setOrder(orderUpdated);
+            if (name !== 'totalPrice') setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
         }
     }
 
@@ -118,13 +143,13 @@ const AddOrder = () => {
                 }
             },
             {
-                field: 'price', headerName: 'Price', width: 200,
+                field: 'price', headerName: 'Single price', width: 200,
                 renderCell: (params) => {
                     return (
                         <TextField
                             fullWidth
-                            name="price"
                             type="number"
+                            name="price"
                             value={order[params.id - 1]?.price}
                             onChange={(e) => handleChange(e, params)}
                         />
@@ -140,6 +165,20 @@ const AddOrder = () => {
                             type="number"
                             name="quantity"
                             value={order[params.id - 1]?.quantity}
+                            onChange={(e) => handleChange(e, params)}
+                        />
+                    );
+                }
+            },
+            {
+                field: 'totalPrice', headerName: 'Total Price', width: 200,
+                renderCell: (params) => {
+                    return (
+                        <TextField
+                            fullWidth
+                            type="number"
+                            name="totalPrice"
+                            value={order[params.id - 1]?.totalPrice}
                             onChange={(e) => handleChange(e, params)}
                         />
                     );
@@ -163,20 +202,6 @@ const AddOrder = () => {
                                 ))
                             }
                         </TextField>
-                    );
-                }
-            },
-            {
-                field: 'createdDate', headerName: 'Purchase Date', width: 200,
-                renderCell: (params) => {
-                    return (
-                        params.id === 1 && <TextField
-                            fullWidth
-                            type="date"
-                            name="createdDate"
-                            value={order[params.id - 1]?.createdDate}
-                            onChange={(e) => handleChange(e, params)}
-                        />
                     );
                 }
             },
@@ -218,7 +243,7 @@ const AddOrder = () => {
             toast.success("Order is added.");
 
             setTimeout(() => {
-                navigate("/orders"); 
+                navigate("/orders");
             }, 2000);
         }
     }
@@ -232,7 +257,7 @@ const AddOrder = () => {
                 <Header title={`Add Order`} subtitle="" />
                 <Box>
                     {Object.keys(updatedOrder).length ? <Button {...editButton} onClick={handleAddOrder}>Save</Button> : <></>}
-                    <Button {...editButton} onClick={addNewItemInOrder}>Add item</Button>
+                    <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                 </Box>
             </Box>
