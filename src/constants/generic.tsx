@@ -1,3 +1,15 @@
+import Item from "../pages/item";
+import Login from "../pages/login";
+import Order from "../pages/order";
+import Vendor from "../pages/vendor";
+import Profile from "../pages/profile";
+import Customer from "../pages/customer";
+import Dashboard from "../pages/dashboard";
+import SingleItem from "../pages/item/single";
+import SingleOrder from "../pages/order/single";
+import SingleVendor from "../pages/vendor/single";
+import SingleCustomer from "../pages/customer/single";
+import AddOrEditOrder from "../pages/order/addOrEdit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -6,7 +18,6 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
 export const pages = {
     "mainMenu": [
@@ -82,5 +93,60 @@ export const paymentMethods = [
         name: "Others",
     },
 ]
+
+export const routes = [
+    {
+        path: '/login',
+        component: <Login/>,
+    },
+    {
+        path: '/',
+        component: <Dashboard />,
+    },
+    {
+        path: '/items',
+        component: <Item />,
+    },
+    {
+        path: '/orders',
+        component: <Order />,
+    },
+    {
+        path: '/vendors',
+        component: <Vendor />,
+    },
+    {
+        path: '/profile',
+        component: <Profile />,
+    },
+    {
+        path: '/customers',
+        component: <Customer />,
+    },
+    {
+        path: '/items/:id',
+        component: <SingleItem />,
+    },
+    {
+        path: '/vendors/:id',
+        component: <SingleVendor />,
+    },
+    {
+        path: '/orders/add',
+        component: <AddOrEditOrder />,
+    },
+    {
+        path: '/orders/view/:id',
+        component: <SingleOrder />,
+    },
+    {
+        path: '/customers/:id',
+        component: <SingleCustomer />,
+    },
+    {
+        path: '/orders/update/:id',
+        component: <AddOrEditOrder />,
+    },
+];
 
 export const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;

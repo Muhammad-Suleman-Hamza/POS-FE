@@ -28,7 +28,7 @@ const Order = () => {
   );
 
   useEffect(() => {
-    if (orders?.length === 0) dispatch(getOrders());
+    if (!orders) dispatch(getOrders());
   }, [])
 
   return (

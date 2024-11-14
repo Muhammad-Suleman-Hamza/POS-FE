@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
 
 const initialState = {
-  customers: getLocalStorage('customers') || [],
+  customers: getLocalStorage('customers'),
 }
 
 export const getCustomer = createAsyncThunk(
@@ -51,6 +51,9 @@ export const customerSlice = createSlice({
   name: 'customer',
   initialState,
   reducers: {
+    clearCsutomers: (state) => {
+      state.customers = undefined
+    }
   },
   extraReducers: builder => {
     builder
@@ -79,6 +82,6 @@ export const customerSlice = createSlice({
   }
 })
 
-export const { customerToBeDeleted } = customerSlice.actions
+export const { clearCsutomers } = customerSlice.actions
 
 export default customerSlice.reducer

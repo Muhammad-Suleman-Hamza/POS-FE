@@ -38,7 +38,7 @@ const Item = () => {
   );
 
   useEffect(() => {
-    if (items?.length === 0) dispatch(getItems())
+    if (!items) dispatch(getItems())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 

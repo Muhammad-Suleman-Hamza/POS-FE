@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
 
 const initialState = {
-  items: getLocalStorage('items') || [],
+  items: getLocalStorage('items'),
 }
 
 export const getItem = createAsyncThunk(
@@ -51,6 +51,9 @@ export const itemSlice = createSlice({
   name: 'item',
   initialState,
   reducers: {
+    clearItems: (state) => {
+      state.items = undefined
+    }
   },
   extraReducers: builder => {
     builder
@@ -79,6 +82,6 @@ export const itemSlice = createSlice({
   }
 })
 
-export const { } = itemSlice.actions
+export const { clearItems } = itemSlice.actions
 
 export default itemSlice.reducer

@@ -37,7 +37,7 @@ const Vendor = () => {
   );
 
   useEffect(() => {
-    if (vendors?.length === 0) dispatch(getVendors())
+    if (!vendors) dispatch(getVendors())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 

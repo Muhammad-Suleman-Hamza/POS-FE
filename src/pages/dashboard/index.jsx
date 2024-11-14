@@ -181,7 +181,7 @@ const Dashboard = () => {
                 Purchased Time
               </Typography>
             </Box>
-            {orders.map((order, i) => (
+            {orders?.map((order, i) => (
               <Box
                 p="15px"
                 display="flex"

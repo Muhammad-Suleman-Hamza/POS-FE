@@ -37,7 +37,7 @@ const Customer = () => {
   );
 
   useEffect(() => {
-    if (customers?.length === 0) dispatch(getCustomers())
+    if (!customers) dispatch(getCustomers())
     return () => dispatch(toggleCreateOrUpdateModal())
   }, [])
 

@@ -1,22 +1,31 @@
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 import { getSessionStorage } from './storage';
-import { Navigate, Outlet } from 'react-router-dom'
-import { useEffect, useState } from 'react';
 
-const ProtectedRoute = () => {
-  const { user } = useSelector((state) => state.auth);
-  const [isAuthorized, setIsAuthorized] = useState(false);
+const ProtectedRoute = ({ children }) => {
+  const { checkSession } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    console.log('herhe :: ', user?.sessionToken !== "")
-    if (user?.sessionToken !== "") setIsAuthorized(true)
-  }, [user, isAuthorized])
+    const token = getSessionStorage('sessionToken');
+    if (!token) {
+      setIsAuthenticated(false);
+    } else {
+      const result = checkSession(token);
+      if (result) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    }
+  }, [checkSession]);
 
-  console.log('isAuthorized :: ', isAuthorized)
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-  return (
-    isAuthorized ? <Outlet /> : <Navigate to='/login' />
-  )
-}
+  return children; // Render protected route if authenticated
+};
 
 export default ProtectedRoute;
