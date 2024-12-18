@@ -32,7 +32,7 @@ const App = () => {
             <main>
               <Topbar />
               <Routes>
-                {/* Public routes */}
+                {/* Public route */}
                 <Route path="/login" element={<Login />} />
 
                 {/* Protected routes */}

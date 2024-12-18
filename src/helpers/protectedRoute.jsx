@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import Loader from '../components/Loader';
 import { useAuth } from '../hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { getSessionStorage } from './storage';
+import React, { useEffect, useState } from 'react';
 
 const ProtectedRoute = ({ children }) => {
   const { checkSession } = useAuth();
@@ -30,7 +31,7 @@ const ProtectedRoute = ({ children }) => {
 
   // Render loading state until authentication status is determined.
   if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+    return <Loader/>
   }
 
   // Redirect to login if not authenticated.
