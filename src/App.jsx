@@ -2,7 +2,7 @@ import Item from "./pages/item";
 import Login from "./pages/login";
 import Order from "./pages/order";
 import Vendor from "./pages/vendor";
-import Reports from "./pages/report";
+import Reports from "./pages/reports";
 import Profile from "./pages/profile";
 import Toast from "./components/Toast";
 import Customer from "./pages/customer";
