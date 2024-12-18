@@ -2,6 +2,7 @@ import Item from "./pages/item";
 import Login from "./pages/login";
 import Order from "./pages/order";
 import Vendor from "./pages/vendor";
+import Reports from "./pages/report";
 import Profile from "./pages/profile";
 import Toast from "./components/Toast";
 import Customer from "./pages/customer";
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/customers/:id" element={<ProtectedRoute><SingleCustomer /></ProtectedRoute>} />
 
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
 
                 {/* Redirect unmatched routes */}
                 <Route path="*" element={<Navigate to="/login" replace />} />

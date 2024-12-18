@@ -23,16 +23,16 @@ export const checkoutSchemaOfItem = yup.object().shape({
 
 export const getItemColumns = (source = '', redirect, editOnClick, deleteOnClick) => {
     const columns = [
-        { field: 'pk', headerName: 'ID', width: 200 },
+        { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'itemName', headerName: 'Name', width: 200 },
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'weight', headerName: 'Weight', width: 200 },
-        { field: 'dimensions', headerName: 'Dimensions', width: 200 },
-        { field: 'measuringUnit', headerName: 'Measuring Unit', width: 200 },
+        { field: 'price', headerName: 'Price', width: 100 },
+        { field: 'weight', headerName: 'Weight', width: 100 },
+        { field: 'dimensions', headerName: 'Dimensions', width: 100 },
+        { field: 'measuringUnit', headerName: 'Measuring Unit', width: 100 },
     ];
 
     if (source !== 'single') {
-        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
+        columns.push({ field: 'operations', headerName: 'Operations', width: 280, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
     }
     return columns;
 }
@@ -99,11 +99,11 @@ export const checkoutSchemaOfOrder = yup.object().shape({
 
 export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
-        { field: 'pk', headerName: 'ID', width: 200 },
+        { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName },
-        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name },
-        { field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
+        { field: 'createdDate', headerName: 'Purchase Date', width: 180 },
+        { field: 'paymentMethod', headerName: 'Payment method', width: 120, valueGetter: (paymentMethod) => paymentMethod.name },
+        { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
     ];
 
     return columns;
@@ -211,8 +211,8 @@ export const checkoutSchemaOfCustomer = yup.object().shape({
 export const getCustomerColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'customerName', headerName: 'Name', width: 200 },
-        { field: 'contact', headerName: 'Contact', width: 200 },
-        { field: 'address', headerName: 'Address', width: 200 },
+        { field: 'contact', headerName: 'Contact', width: 100 },
+        { field: 'address', headerName: 'Address', width: 300 },
     ];
 
     if (source !== 'single') {
@@ -269,9 +269,9 @@ export const checkoutSchemaOfVendor = yup.object().shape({
 export const getVendorColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'vendorName', headerName: 'Name', width: 200 },
-        { field: 'contact', headerName: 'contact', width: 200 },
-        { field: 'comapny', headerName: 'Comapny', width: 200 },
-        { field: 'address', headerName: 'Address', width: 200 },
+        { field: 'contact', headerName: 'contact', width: 100 },
+        { field: 'comapny', headerName: 'Comapny', width: 100 },
+        { field: 'address', headerName: 'Address', width: 300 },
     ];
 
     if (source !== 'single') {
@@ -408,6 +408,16 @@ export const backButton = {
     buttonsource: 'back',
     variant: "contained",
     style: { marginLeft: 16 },
+    sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
+}
+
+export const datePickerButton = {
+    title: "Pick Date",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'pickDate',
+    variant: "contained",
     sx: { gridColumn: "span 4" },
     anchorsx: { color: "black", textDecoration: "none" }
 }

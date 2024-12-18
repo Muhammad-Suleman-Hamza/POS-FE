@@ -28,8 +28,6 @@ const ProtectedRoute = ({ children }) => {
     verifySession();
   }, []); // Empty dependency array to prevent infinite re-renders.
 
-  console.log('px :: isAuthenticated :: ', isAuthenticated);
-
   // Render loading state until authentication status is determined.
   if (isAuthenticated === null) {
     return <div>Loading...</div>;
