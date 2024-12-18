@@ -2,8 +2,9 @@ import { useState } from "react";
 import { tokens } from "../../../theme";
 import { Link } from "react-router-dom";
 import { useProSidebar } from "react-pro-sidebar";
-import { pages } from '../../../constants/generic'
+import { pages } from '../../../constants/generic';
 import { useSidebarContext } from "./sidebarContext";
+import { useLogout } from "../../../hooks/useLogout";
 import { Menu, Sidebar, MenuItem } from "react-pro-sidebar";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -11,17 +12,18 @@ import { useTheme, Box, Typography, IconButton } from "@mui/material";
 import SwitchLeftOutlinedIcon from "@mui/icons-material/SwitchLeftOutlined";
 import SwitchRightOutlinedIcon from "@mui/icons-material/SwitchRightOutlined";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ to, key, icon, title, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
     <MenuItem
-      active={selected === title}
-      style={{ color: colors.grey[100] }}
-      onClick={() => setSelected(title)}
+      key={key}
       icon={icon}
+      active={selected === title}
       routerLink={<Link to={to} />}
+      onClick={() => setSelected(title)}
+      style={{ color: colors.grey[100] }}
     >
       <Typography>{title}</Typography>
     </MenuItem>
@@ -30,10 +32,12 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 
 const MyProSidebar = () => {
   const theme = useTheme();
+  const { logout } = useLogout();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
   const { sidebarRTL, setSidebarRTL, sidebarImage } = useSidebarContext();
   const { collapseSidebar, toggleSidebar, collapsed, broken } = useProSidebar();
+  
   return (
     <Box
       sx={{
@@ -125,8 +129,8 @@ const MyProSidebar = () => {
               pages.mainMenu.map((page, index) => (
                 <Item
                   key={index}
-                  icon={page.icon}
                   to={page.route}
+                  icon={page.icon}
                   title={page.title}
                   selected={selected}
                   setSelected={setSelected}
@@ -144,11 +148,11 @@ const MyProSidebar = () => {
               pages.settings.map((page, index) => (
                 <Item
                   key={index}
-                  icon={page.icon}
                   to={page.route}
+                  icon={page.icon}
                   title={page.title}
                   selected={selected}
-                  setSelected={setSelected}
+                  setSelected={()=> { setSelected(); if (page.title === 'Logout') logout()}}
                 />
               ))
             }

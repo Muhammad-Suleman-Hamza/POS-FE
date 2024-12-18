@@ -1,81 +1,141 @@
 import { tokens } from "../../theme";
-import { toast } from 'react-toastify';
-import Form from "../../components/Form";
 import Button from '@mui/material/Button';
+import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
-import BasicModal from '../../components/Modal';
 import { Link, useParams } from "react-router-dom";
-import { deleteOrder } from "../../store/slices/order";
-import { useDispatch, useSelector } from "react-redux";
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
-import {
-    addButton,
-    backButton, 
-    editButton, 
-    getOrderFormFields,
-    initialValuesOfOrder,
-    checkoutSchemaOfOrder,
-    getSingleOrderColumns
-} from '../../constants/FormFields'
+import { backButton, editButton } from '../../constants/FormFields'
 
-const SingleOrder = () => {
+const ViewOrder = () => {
     const theme = useTheme();
     const { id } = useParams();
-    const dispatch = useDispatch();
     const colors = tokens(theme.palette.mode);
 
     const [order, setOrder] = useState([]);
+    const [currentOrder, setCurrentOrder] = useState({});
 
-    const { items } = useSelector((state) => state.item);
     const { orders } = useSelector((state) => state.order);
-    const { customers } = useSelector((state) => state.customer);
-    const { showCreateOrUpdateModal, entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
-    const formColumns = getOrderFormFields(items, customers);
-    const orderColumns = getSingleOrderColumns(
-        'single',
-        (params) => `${params.row.pk}`,
-        (params) => dispatch(saveEntryToBeUpdated(params.row)),
-        async (params) => {
-            const result = await dispatch(deleteOrder(params.row.pk))
-            if (result.payload.status === 200) toast.warning("Order is deleted.")
-        }
-    );
 
     const formatOrders = () => {
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, orderItem, customerPK, createdDate, customerName, paymentMethodPK, paymentMethodName } = localOrder;
+        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             newOrderStructure.push({
-                customerPK,
-                id: index + 1,
+                customer,
                 createdDate,
-                customerName,
-                paymentMethodPK,
-                paymentMethodName,
+                paymentMethod,
+                id: index + 1,
                 price: price[index],
                 quantity: quantity[index],
-                orderItem: index === 0 ? orderItem[index].orderItemName : orderItem[index][`orderItem-${index + 1}Name`],
+                orderItem: orderItem[index],
+                totalPrice: price[index] * quantity[index]
             })
+
+            setOrder(newOrderStructure);
         }
-        setOrder(newOrderStructure);
+
+        setCurrentOrder(localOrder);
+    }
+
+    const getSingleOrderColumns = () => {
+        const columns = [
+            { field: 'id', headerName: 'ID', width: 200 },
+            {
+                field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {order[params.id - 1]?.orderItem?.itemName}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'price', headerName: 'Single price', width: 200,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {order[params.id - 1]?.price}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'quantity', headerName: 'Quantity', width: 200,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {order[params.id - 1]?.quantity}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'totalPrice', headerName: 'Total Price', width: 200,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {order[params.id - 1]?.totalPrice}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.customer?.customerName}
+                        </>
+
+                    );
+                }
+            },
+            {
+                field: 'createdDate', headerName: 'Purchase Date', width: 200,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.createdDate}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.paymentMethod?.pk}
+                        </>
+                    );
+                }
+            },
+        ];
+
+        return columns;
     }
 
     useEffect(() => {
         if (id && !order.length) formatOrders()
-        return () => dispatch(toggleCreateOrUpdateModal())
     }, []);
 
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Header title={`Order: ${id}`} subtitle="" />
-                <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
+                <Box>
+                    <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
+                    <Button {...editButton}><Link to={`/orders/update/${currentOrder?.pk}`} style={{ ...backButton.anchorsx }}>Edit</Link></Button>
+                </Box>
             </Box>
             <Box
                 m="8px 0 0 0"
@@ -106,33 +166,19 @@ const SingleOrder = () => {
                     },
                 }}
             >
-                <DataGrid 
-                    rows={order} 
-                    unstable_rowSpanning
-                    columns={orderColumns} 
-                    showCellVerticalBorder
-                    showColumnVerticalBorder
-                    disableRowSelectionOnClick
-                    getRowId={(row) => row.id} 
-                />
-
-                <BasicModal
-                    handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-                    open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
-                >
-                    <Form
-                        subtitle=""
-                        source='order'
-                        inputsFields={formColumns}
-                        checkoutSchema={checkoutSchemaOfOrder}
-                        button={showCreateOrUpdateModal.create ? addButton : editButton}
-                        title={showCreateOrUpdateModal.create ? "Create Order" : "Update Order"}
-                        initialValues={showCreateOrUpdateModal.create ? initialValuesOfOrder : entryToBeUpdateOrDelete}
+                {
+                    order.length &&
+                    <DataGrid
+                        rows={order}
+                        showCellVerticalBorder
+                        showColumnVerticalBorder
+                        getRowId={(row) => row.id}
+                        columns={getSingleOrderColumns()}
                     />
-                </BasicModal>
+                }
             </Box>
         </Box>
     );
 };
 
-export default SingleOrder;
+export default ViewOrder;

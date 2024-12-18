@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
+    isLoading: false,
     entryToBeUpdateOrDelete: undefined,
     showCreateOrUpdateModal: {
         create: false,
@@ -12,6 +13,9 @@ export const commonSlice = createSlice({
   name: 'common',
   initialState,
   reducers: {
+    toggleLoading: (state) => {
+        state.isLoading = !state.isLoading
+    },
     toggleCreateOrUpdateModal: (state, { payload }) => {
         if (payload) state.showCreateOrUpdateModal[payload.action] = payload.value
         else {
@@ -26,6 +30,6 @@ export const commonSlice = createSlice({
   },
 })
 
-export const { toggleCreateOrUpdateModal, saveEntryToBeUpdated } = commonSlice.actions
+export const { toggleLoading, saveEntryToBeUpdated, toggleCreateOrUpdateModal } = commonSlice.actions
 
 export default commonSlice.reducer

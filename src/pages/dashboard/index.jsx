@@ -118,7 +118,7 @@ const Dashboard = () => {
         </Grid> */}
 
         {/* Recent Orders */}
-        <Grid size={6}>
+        <Grid size={12}>
           <Box
             backgroundColor={colors.primary[400]}
             maxHeight="100vh"
@@ -181,7 +181,7 @@ const Dashboard = () => {
                 Purchased Time
               </Typography>
             </Box>
-            {orders.map((order, i) => (
+            {orders?.map((order, i) => (
               <Box
                 p="15px"
                 display="flex"
@@ -196,7 +196,7 @@ const Dashboard = () => {
                     fontWeight="600"
                     color={colors.greenAccent[100]}
                   >
-                    {order.customerName}
+                    {order?.customer?.customerName}
                   </Typography>
                 </Box>
                 <Box width={100}>
@@ -205,7 +205,7 @@ const Dashboard = () => {
                     fontWeight="600"
                     color={colors.greenAccent[100]}
                   >
-                    {order.price}
+                    {order?.price?.reduce((accumulator, currentValue) => accumulator + Number(currentValue), 0)}
                   </Typography>
                 </Box>
                 <Box width={100}>
@@ -214,7 +214,7 @@ const Dashboard = () => {
                     fontWeight="600"
                     color={colors.greenAccent[100]}
                   >
-                    {order.paymentMethodName}
+                    {order?.paymentMethod?.name}
                   </Typography>
                 </Box>
                 <Box width={200}>
@@ -223,7 +223,7 @@ const Dashboard = () => {
                     fontWeight="600"
                     color={colors.greenAccent[100]}
                   >
-                    {order.createdDate}
+                    {order?.createdDate}
                   </Typography>
                 </Box>
               </Box>

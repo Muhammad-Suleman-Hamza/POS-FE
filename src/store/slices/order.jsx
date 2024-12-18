@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
 
 const initialState = {
-  orders: getLocalStorage('orders') || [],
+  orders: getLocalStorage('orders'),
 }
 
 export const getOrder = createAsyncThunk(
@@ -51,9 +51,9 @@ export const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {
-    orderToBeDeleted: (state, { payload }) => {
-      state.orders = state.orders.filter((item) => item.id !== payload.id);;
-    },
+    clearOrders: (state) => {
+      state.orders = undefined
+    }
   },
   extraReducers: builder => {
     builder
@@ -84,7 +84,7 @@ export const orderSlice = createSlice({
   }
 })
 
-export const { orderToBeDeleted } = orderSlice.actions
+export const { clearOrders } = orderSlice.actions
 
 export default orderSlice.reducer
 
