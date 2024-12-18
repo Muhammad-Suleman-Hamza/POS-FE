@@ -63,7 +63,90 @@ const SingleOrder = () => {
                 orderItem: index === 0 ? orderItem[index].orderItemName : orderItem[index][`orderItem-${index + 1}Name`],
             })
         }
-        setOrder(newOrderStructure);
+
+        setCurrentOrder(localOrder);
+    }
+
+    const getSingleOrderColumns = () => {
+        const columns = [
+            { field: 'id', headerName: 'ID', width: 50 },
+            {
+                field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {order[params.id - 1]?.orderItem?.itemName}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'price', headerName: 'Single price', width: 100,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {order[params.id - 1]?.price}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'quantity', headerName: 'Quantity', width: 100,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {order[params.id - 1]?.quantity}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'totalPrice', headerName: 'Total Price', width: 100,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {order[params.id - 1]?.totalPrice}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'customer', headerName: 'Customer', width: 100, valueGetter: (customer) => customer?.customerName,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.customer?.customerName}
+                        </>
+
+                    );
+                }
+            },
+            {
+                field: 'createdDate', headerName: 'Purchase Date', width: 180,
+                renderCell: (params) => {
+                    return (
+
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.createdDate}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'paymentMethod', headerName: 'Payment method', width: 120, valueGetter: (paymentMethod) => paymentMethod?.name,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {params.id === 1 && order[params.id - 1]?.paymentMethod?.pk}
+                        </>
+                    );
+                }
+            },
+        ];
+
+        return columns;
     }
 
     useEffect(() => {

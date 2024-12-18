@@ -7,16 +7,25 @@ const ProtectedRoute = () => {
   const { user } = useSelector((state) => state.auth);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
-  useEffect(() => {
-    console.log('herhe :: ', user?.sessionToken !== "")
-    if (user?.sessionToken !== "") setIsAuthorized(true)
-  }, [user, isAuthorized])
+  // useEffect(() => {
+  //   console.log('herhe :: ', user?.sessionToken !== "")
+  //   if (user?.sessionToken !== "") setIsAuthorized(true)
+  // }, [user, isAuthorized])
 
-  console.log('isAuthorized :: ', isAuthorized)
+  // console.log('isAuthorized :: ', isAuthorized)
 
-  return (
-    isAuthorized ? <Outlet /> : <Navigate to='/login' />
-  )
-}
+  // Render loading state until authentication status is determined.
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>;
+  }
+
+  // Redirect to login if not authenticated.
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Render the protected content if authenticated.
+  return children;
+};
 
 export default ProtectedRoute;

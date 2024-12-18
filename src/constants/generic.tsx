@@ -62,20 +62,16 @@ export const pages = {
 
 export const paymentMethods = [
     {
-        pk: "COD",
-        name: "Cash on Delivery",
+        pk: "Cash",
+        name: "Cash",
     },
     {
-        pk: "CashCheque",
-        name: "Cash Cheque",
+        pk: "Cheque",
+        name: "Cheque",
     },
     {
-        pk: "CrossCheque",
-        name: "Cross Cheque",
-    },
-    {
-        pk: "Installments",
-        name: "Installments",
+        pk: "Parchi",
+        name: "Parchi",
     },
     {
         pk: "Others",

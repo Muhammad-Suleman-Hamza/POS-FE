@@ -26,3 +26,17 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.date-picker {
+  top: 10.1rem;
+  right: 1.2rem;
+  position: absolute;
+}
+
+.datePickerHeaderStyling {
+  width: 420px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: space-between;
+}
