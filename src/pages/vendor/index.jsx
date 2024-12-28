@@ -40,8 +40,10 @@ const Vendor = () => {
 
 
   const deleteCB = async () => {
-    const result = await dispatch(deleteVendor(entryToBeUpdateOrDelete.pk))
-    if (result.payload.status === 200) toast.success("Vendor is deleted.")
+    await dispatch(toggleLoading());
+    const result = await dispatch(deleteVendor(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Vendor is deleted.");
+      await dispatch(toggleLoading()); 
   }
 
   useEffect(() => {

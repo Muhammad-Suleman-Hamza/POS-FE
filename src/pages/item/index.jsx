@@ -10,7 +10,12 @@ import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteItem, getItems } from "../../store/slices/item";
 import { DeleteConfirmation } from "../../components/deleteComfirmation";
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated, toggleDeleteConfirmationModal } from "../../store/slices/common";
+import { 
+  toggleLoading,
+  saveEntryToBeUpdated, 
+  toggleCreateOrUpdateModal, 
+  toggleDeleteConfirmationModal 
+} from "../../store/slices/common";
 import {
   addButton,
   editButton,
@@ -36,8 +41,10 @@ const Item = () => {
   );
 
   const deleteCB = async () => {
-    const result = await dispatch(deleteItem(entryToBeUpdateOrDelete.pk))
-    if (result.payload.status === 200) toast.success("Item is deleted.")
+    await dispatch(toggleLoading());
+    const result = await dispatch(deleteItem(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Item is deleted.");
+    await dispatch(toggleLoading());
   }
 
   useEffect(() => {

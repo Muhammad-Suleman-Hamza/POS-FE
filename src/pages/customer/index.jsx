@@ -11,10 +11,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { DeleteConfirmation } from "../../components/deleteComfirmation";
 import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { editButton, getCustomerColumns } from '../../constants/FormFields';
-import { 
-  saveEntryToBeUpdated, 
-  toggleCreateOrUpdateModal, 
-  toggleDeleteConfirmationModal 
+import {
+  saveEntryToBeUpdated,
+  toggleCreateOrUpdateModal,
+  toggleDeleteConfirmationModal
 } from "../../store/slices/common";
 import {
   addButton,
@@ -40,8 +40,10 @@ const Customer = () => {
 
 
   const deleteCB = async () => {
+    await dispatch(toggleLoading()); 
     const result = await dispatch(deleteCustomer(entryToBeUpdateOrDelete.pk));
-    if (result.payload.status === 200) toast.success("Customer is deleted.")
+    if (result.payload.status === 200) toast.success("Customer is deleted.");
+    await dispatch(toggleLoading());
   }
 
   useEffect(() => {

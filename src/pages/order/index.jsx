@@ -29,8 +29,10 @@ const Order = () => {
 
 
   const deleteCB = async () => {
-    const result = await dispatch(deleteOrder(entryToBeUpdateOrDelete.pk))
-    if (result.payload.status === 200) toast.success("Order is deleted.")
+    await dispatch(toggleLoading()); 
+    const result = await dispatch(deleteOrder(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Order is deleted.");
+      await dispatch(toggleLoading()); 
   }
 
   useEffect(() => {
