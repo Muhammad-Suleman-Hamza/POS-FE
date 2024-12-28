@@ -12,9 +12,10 @@ import { DeleteConfirmation } from "../../components/deleteComfirmation";
 import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { editButton, getCustomerColumns } from '../../constants/FormFields';
 import {
+  toggleLoading,
   saveEntryToBeUpdated,
   toggleCreateOrUpdateModal,
-  toggleDeleteConfirmationModal
+  toggleDeleteConfirmationModal,
 } from "../../store/slices/common";
 import {
   addButton,

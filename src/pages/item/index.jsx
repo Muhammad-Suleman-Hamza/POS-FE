@@ -23,7 +23,7 @@ import {
   itemFormColumns,
   initialValuesOfItem,
   checkoutSchemaOfItem,
-} from '../../constants/FormFields'
+} from '../../constants/FormFields';
 
 const Item = () => {
   const theme = useTheme();
