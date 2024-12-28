@@ -8,9 +8,14 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { editButton, getCustomerColumns } from '../../constants/FormFields';
+import { DeleteConfirmation } from "../../components/deleteComfirmation";
 import { getCustomers, deleteCustomer } from "../../store/slices/customer";
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
+import { editButton, getCustomerColumns } from '../../constants/FormFields';
+import { 
+  saveEntryToBeUpdated, 
+  toggleCreateOrUpdateModal, 
+  toggleDeleteConfirmationModal 
+} from "../../store/slices/common";
 import {
   addButton,
   customerFormColumns,
@@ -30,11 +35,14 @@ const Customer = () => {
     '',
     (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
-    async (params) => {
-      const result = await dispatch(deleteCustomer(params.row.pk));
-      if (result.payload.status === 200) toast.warning("Customer is deleted.")
-    }
+    (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
+
+
+  const deleteCB = async () => {
+    const result = await dispatch(deleteCustomer(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Customer is deleted.")
+  }
 
   useEffect(() => {
     if (!customers) dispatch(getCustomers())
@@ -83,7 +91,7 @@ const Customer = () => {
           showColumnVerticalBorder
           columns={customerColumns}
           disableRowSelectionOnClick
-          getRowId={(row) => row.pk}
+          getRowId={(row) => row?.pk}
         />
 
         <BasicModal
@@ -92,7 +100,7 @@ const Customer = () => {
         >
           <Form
             subtitle=""
-            source='customer'
+            source="customer"
             inputsFields={customerFormColumns}
             checkoutSchema={checkoutSchemaOfCustomer}
             button={showCreateOrUpdateModal.create ? addButton : editButton}
@@ -100,6 +108,8 @@ const Customer = () => {
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfCustomer : entryToBeUpdateOrDelete}
           />
         </BasicModal>
+
+        <DeleteConfirmation cb={deleteCB} />
       </Box>
     </Box>
   );

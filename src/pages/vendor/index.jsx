@@ -8,9 +8,14 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { editButton, getVendorColumns } from '../../constants/FormFields';
 import { deleteVendor, getVendors } from "../../store/slices/vendor";
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
+import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { editButton, getVendorColumns } from '../../constants/FormFields';
+import { 
+  saveEntryToBeUpdated,
+  toggleCreateOrUpdateModal, 
+  toggleDeleteConfirmationModal
+} from "../../store/slices/common";
 import {
   addButton,
   vendorFormColumns,
@@ -30,11 +35,14 @@ const Vendor = () => {
     '',
     (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
-    async (params) => {
-      const result = await dispatch(deleteVendor(params.row.pk))
-      if (result.payload.status === 200) toast.warning("Vendor is deleted.")
-    }
+    (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
+
+
+  const deleteCB = async () => {
+    const result = await dispatch(deleteVendor(entryToBeUpdateOrDelete.pk))
+    if (result.payload.status === 200) toast.success("Vendor is deleted.")
+  }
 
   useEffect(() => {
     if (!vendors) dispatch(getVendors())
@@ -83,7 +91,7 @@ const Vendor = () => {
           columns={vendorColumns}
           showColumnVerticalBorder
           disableRowSelectionOnClick
-          getRowId={(row) => row.pk}
+          getRowId={(row) => row?.pk}
         />
 
         {/* Crate or Update vendor modal */}
@@ -93,7 +101,7 @@ const Vendor = () => {
         >
           <Form
             subtitle=""
-            source='vendor'
+            source="vendor"
             inputsFields={vendorFormColumns}
             checkoutSchema={checkoutSchemaOfVendor}
             button={showCreateOrUpdateModal.create ? addButton : editButton}
@@ -101,6 +109,8 @@ const Vendor = () => {
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfVendor : entryToBeUpdateOrDelete}
           />
         </BasicModal>
+
+        <DeleteConfirmation cb={deleteCB} />
       </Box>
     </Box>
   );
