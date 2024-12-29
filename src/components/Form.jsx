@@ -12,7 +12,7 @@ import { addCustomer, updateCustomer } from '../store/slices/customer';
 import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
 import { toggleLoading, toggleCreateOrUpdateModal } from '../store/slices/common';
 
-const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
+const Form = ({ cb = undefined, title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
@@ -26,8 +26,8 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
   const handleFormSubmit = async (values) => {
     console.log('values :: ', values);
 
-    let toastText = undefined;
     let result = undefined;
+    let toastText = undefined;
 
     if (source === 'order') values = combineOrderAttributes(values);
 
@@ -76,6 +76,11 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
     else if (result.payload.status === 200) {
       dispatch(toggleCreateOrUpdateModal())
       toast.success(toastText);
+    }
+
+    if (cb && typeof cb === 'function') {
+      console.log('pos :: cb called :: ')
+      cb();
     }
 
     console.log(result)

@@ -6,6 +6,10 @@ export const setSessionStorage = (key, value) => {
     return window.sessionStorage.setItem(key, JSON.stringify(value))
 }
 
+export const removeSessionStorage = (key) => {
+    window.sessionStorage.removeItem(key)
+}
+
 export const clearSessionStorage = () => {
     window.sessionStorage.clear();
 }

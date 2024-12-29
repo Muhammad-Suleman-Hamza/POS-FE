@@ -1,15 +1,32 @@
-import { useEffect, useState } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
+import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { addOrder } from "../../store/slices/order";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import BasicModal from "../../components/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { addOrder, updateOrder } from "../../store/slices/order";
 import { Box, MenuItem, TextField, useTheme } from "@mui/material";
-import { backButton, editButton, getEmptyOrder } from '../../constants/FormFields'
+import { toggleCreateOrUpdateModal } from "../../store/slices/common";
+import {
+    getLocalStorage,
+    setSessionStorage,
+    getSessionStorage,
+    removeSessionStorage,
+} from "../../helpers/storage";
+import {
+    addButton,
+    backButton,
+    editButton,
+    getEmptyOrder,
+    customerFormColumns,
+    initialValuesOfCustomer,
+    checkoutSchemaOfCustomer
+} from '../../constants/FormFields'
 
 const AddOrder = () => {
     const theme = useTheme();
@@ -23,10 +40,10 @@ const AddOrder = () => {
     const { items } = useSelector((state) => state.item);
     const { orders } = useSelector((state) => state.order);
     const { customers } = useSelector((state) => state.customer);
+    const { showCreateOrUpdateModal } = useSelector((state) => state.common);
 
     const [order, setOrder] = useState([]);
     const [editable, setEditable] = useState(false);
-    // const [order, setOrder] = useState([getEmptyOrder()]);
     const [updatedOrder, setUpdatedOrder] = useState({
         price: [],
         customer: {},
@@ -65,7 +82,7 @@ const AddOrder = () => {
             orderItem: '',
             totalPrice: 0,
             paymentMethod,
-            id: order?.length || 0 + 1
+            id: order?.length + 1
         };
 
         if (source === 'edit') {
@@ -150,6 +167,12 @@ const AddOrder = () => {
         }
     }
 
+    const handleNewCustomer = async () => {
+        setSessionStorage('tempOrder', order);
+        setSessionStorage('tempUpdatedOrder', updatedOrder);
+        await dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }));
+    }
+
     const getSingleOrderColumns = () => {
         const columns = source === 'add' ?
             [
@@ -221,7 +244,8 @@ const AddOrder = () => {
                     field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
-                            params.id === 1 && <TextField
+                            params.id === 1 &&
+                            <TextField
                                 select
                                 fullWidth
                                 type="string"
@@ -229,6 +253,7 @@ const AddOrder = () => {
                                 onChange={(e) => handleChange(e, params)}
                                 value={order[params.id - 1]?.customer?.pk}
                             >
+                                <MenuItem key={'new'} value={'new'} onClick={handleNewCustomer}>Add Customer</MenuItem>
                                 {
                                     customers?.map((customer) => (
                                         <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
@@ -427,12 +452,14 @@ const AddOrder = () => {
 
             setTimeout(() => {
                 navigate("/orders");
+                removeSessionStorage('tempOrder');
+                removeSessionStorage('updateOrder');
             }, 2000);
         }
     }
 
     const handleUpdateOrder = async () => {
-        const result = await dispatch(updatedOrder(updatedOrder));
+        const result = await dispatch(updateOrder(updatedOrder));
         console.log(result)
 
         if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
@@ -443,13 +470,40 @@ const AddOrder = () => {
 
     }
 
+    const handleCustomerAddedCB = () => {
+        const tempOrder = getSessionStorage('tempOrder');
+        const tempCustomer = getLocalStorage('customers');
+        const tempUpdatedOrder = getSessionStorage('tempUpdatedOrder');
+
+        const newCustomer = tempCustomer[customers.length];
+
+        tempUpdatedOrder['customer'] = newCustomer;
+        const updatedTempOrder = tempOrder.map(o => ({
+            ...o,
+            customer: newCustomer
+        }));
+
+        setOrder(updatedTempOrder);
+        setUpdatedOrder(tempUpdatedOrder);
+
+        setSessionStorage('tempOrder', updatedTempOrder);
+        setSessionStorage('tempUpdatedOrder', tempUpdatedOrder);
+    }
+
     useEffect(() => {
-        if (id && source === 'edit' && !order?.length) formatOrders()
+        const tempOrder = getSessionStorage('tempOrder');
+        const tempUpdatedOrder = getSessionStorage('tempUpdatedOrder');
+        if (tempOrder) {
+            setOrder(tempOrder);
+            setUpdatedOrder(tempUpdatedOrder);
+            setTimeout(() => {
+                removeSessionStorage('tempOrder');
+                removeSessionStorage('tempUpdatedOrder');
+            }, 2000);
+        }
+        else if (id && source === 'edit' && !order?.length) formatOrders()
         else if (!id && source === 'add' && !order?.length) addNewItemInOrder();
     }, []);
-
-    console.log('order :: ', order);
-    console.log('updatedOrder :: ', updatedOrder);
 
     return (
         <Box m="20px">
@@ -504,6 +558,23 @@ const AddOrder = () => {
                     />
                 }
             </Box>
+
+            {/* customer modal */}
+            <BasicModal
+                open={showCreateOrUpdateModal.create}
+                handleClose={() => dispatch(toggleCreateOrUpdateModal())}
+            >
+                <Form
+                    subtitle=""
+                    source="customer"
+                    button={addButton}
+                    title={"Create Customer"}
+                    cb={handleCustomerAddedCB}
+                    inputsFields={customerFormColumns}
+                    initialValues={initialValuesOfCustomer}
+                    checkoutSchema={checkoutSchemaOfCustomer}
+                />
+            </BasicModal>
         </Box>
     );
 };
