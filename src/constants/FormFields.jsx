@@ -2,7 +2,8 @@ import * as yup from 'yup';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import { paymentMethods } from './generic';
+import { paymentMethods, rights } from './generic';
+import { getSessionStorage } from '../helpers/storage';
 
 // Item
 export const initialValuesOfItem = {
@@ -423,11 +424,28 @@ export const datePickerButton = {
 }
 
 export const getRowButtons = (params, redirect = undefined, editOnClick = undefined, deleteOnClick = undefined) => {
+
     return (
         <Box>
-            {editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
-            {deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
+            {getUserPersmission('edit', 'table') && editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
+            {getUserPersmission('delete', 'table') && deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
             {redirect && <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>}
         </Box>
     )
+}
+
+export const getUserPersmission = (access, flow) => {
+    const user = getSessionStorage('user');
+    const right = user?.rights;
+    let result = false;
+
+    if (flow === 'table') {
+        if (access === 'delete') result = right === rights.super || right === rights.admin;
+        else if (access === 'edit') result = right === rights.super || right === rights.admin || right === rights.manager;
+    }
+    else if (flow === 'profile') {
+        if (access === 'edit') result = right === rights.super || right === rights.admin;
+    }
+
+    return result;
 }

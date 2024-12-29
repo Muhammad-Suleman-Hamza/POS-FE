@@ -7,6 +7,13 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 
+export const rights = {
+    "super": 69,
+    "admin": 57,
+    "helper": 61,
+    "manager": 29
+}
+
 export const pages = {
     "mainMenu": [
         {

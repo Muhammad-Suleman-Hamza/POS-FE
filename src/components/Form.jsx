@@ -79,7 +79,6 @@ const Form = ({ cb = undefined, title, button, source = '', subTitle, initialVal
     }
 
     if (cb && typeof cb === 'function') {
-      console.log('pos :: cb called :: ')
       cb();
     }
 
