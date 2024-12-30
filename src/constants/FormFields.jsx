@@ -9,6 +9,7 @@ import { getSessionStorage } from '../helpers/storage';
 export const initialValuesOfItem = {
     price: "",
     weight: "",
+    quantity: "",
     itemName: "",
     dimensions: "",
     measuringUnit: "",
@@ -16,10 +17,11 @@ export const initialValuesOfItem = {
 
 export const checkoutSchemaOfItem = yup.object().shape({
     price: yup.number().required("Required"),
-    weight: yup.string().required("Required"),
+    quantity: yup.string().required("Required"),
+    // weight: yup.string().required("Required"),
     itemName: yup.string().required("Required"),
-    dimensions: yup.string().required("Required"),
-    measuringUnit: yup.string().required("Required"),
+    // dimensions: yup.string().required("Required"),
+    // measuringUnit: yup.string().required("Required"),
 })
 
 export const getItemColumns = (source = '', redirect, editOnClick, deleteOnClick) => {
@@ -27,6 +29,7 @@ export const getItemColumns = (source = '', redirect, editOnClick, deleteOnClick
         { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'itemName', headerName: 'Name', width: 200 },
         { field: 'price', headerName: 'Price', width: 100 },
+        { field: 'quantity', headerName: 'Quantity', width: 100 },
         { field: 'weight', headerName: 'Weight', width: 100 },
         { field: 'dimensions', headerName: 'Dimensions', width: 100 },
         { field: 'measuringUnit', headerName: 'Measuring Unit', width: 100 },
@@ -52,6 +55,14 @@ export const itemFormColumns = [
         label: "Price",
         type: "number",
         fullWidth: true,
+        variant: "filled",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        type: "number",
+        fullWidth: true,
+        name: "quantity",
+        label: "Quantity",
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },

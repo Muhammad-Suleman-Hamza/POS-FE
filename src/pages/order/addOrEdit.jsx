@@ -27,6 +27,7 @@ import {
     initialValuesOfCustomer,
     checkoutSchemaOfCustomer
 } from '../../constants/FormFields'
+import { getItems } from "../../store/slices/item";
 
 const AddOrder = () => {
     const theme = useTheme();
@@ -45,6 +46,7 @@ const AddOrder = () => {
     const [order, setOrder] = useState([]);
     const [editable, setEditable] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState({
+        note: [],
         price: [],
         customer: {},
         quantity: [],
@@ -55,7 +57,7 @@ const AddOrder = () => {
     const formatOrders = () => {
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
+        const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             newOrderStructure.push({
@@ -63,6 +65,7 @@ const AddOrder = () => {
                 createdDate,
                 paymentMethod,
                 id: index + 1,
+                note: note[index],
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
@@ -76,6 +79,7 @@ const AddOrder = () => {
     const addNewItemInOrder = () => {
         const { customer, createdDate, paymentMethod } = updatedOrder;
         const newOrder = {
+            note: '',
             price: 0,
             customer,
             quantity: 0,
@@ -102,7 +106,7 @@ const AddOrder = () => {
         else if (name === 'paymentMethod') result = paymentMethods.find((paymentMethod) => paymentMethod.pk === value)
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
-            const newItem = { ...items.find((order) => order.pk === value) };
+            const newItem = { ...items.find((item) => item.pk === value) };
 
             newItem['id'] = params.id;
             newOrderItems[params.id - 1]['quantity'] = 0;
@@ -130,7 +134,33 @@ const AddOrder = () => {
             newOrderItemsPrice[params.id - 1] = Number(value);
             result = newOrderItemsPrice;
         }
+        else if (name === 'note') {
+            const newOrderItemsNote = [...updatedOrder.note];
+            newOrderItemsNote[params.id - 1] = value;
+            result = newOrderItemsNote;
+        }
         else if (name === 'quantity') {
+
+            if (updatedOrder?.orderItem?.length) {
+                const tempUpdatedOrder = JSON.parse(JSON.stringify(updatedOrder));;
+                // current item
+                const localItem = { ...items.find((item) => item.pk === updatedOrder['orderItem'][params.id - 1]['pk']) };
+
+                // item quantity check with required quantity
+                if (value > Number(localItem?.quantity)) {
+                    toast.error(`Only ${localItem?.quantity} remaining for ${localItem?.itemName}`);
+                    return;
+                }
+
+                console.log('pos :: localItem :: ', localItem);
+                console.log('pos :: tempUpdatedOrder :: ', tempUpdatedOrder['orderItem'][params.id - 1]);
+
+
+                localItem['quantity'] = localItem?.quantity - value;
+                tempUpdatedOrder['orderItem'][params.id - 1] = localItem;
+                setUpdatedOrder(tempUpdatedOrder);
+            }
+
             const newOrderItemsQuantity = [...updatedOrder.quantity];
             newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
@@ -167,18 +197,12 @@ const AddOrder = () => {
         }
     }
 
-    const handleNewCustomer = async () => {
-        setSessionStorage('tempOrder', order);
-        setSessionStorage('tempUpdatedOrder', updatedOrder);
-        await dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }));
-    }
-
     const getSingleOrderColumns = () => {
         const columns = source === 'add' ?
             [
-                { field: 'id', headerName: 'ID', width: 200 },
+                { field: 'id', headerName: 'ID', width: 200, align: "center", headerAlign: "center" },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -199,7 +223,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'price', headerName: 'Single price', width: 200,
+                    field: 'price', headerName: 'Single price', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -213,7 +237,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'quantity', headerName: 'Quantity', width: 200,
+                    field: 'quantity', headerName: 'Quantity', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -227,7 +251,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200,
+                    field: 'totalPrice', headerName: 'Total Price', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -241,7 +265,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
                             params.id === 1 &&
@@ -264,7 +288,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             params.id === 1 && <TextField
@@ -284,12 +308,29 @@ const AddOrder = () => {
                         );
                     }
                 },
+                {
+                    field: 'note', headerName: 'Note', width: 400, align: "center", display: "flex", headerAlign: "center",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                rows={2}
+                                fullWidth
+                                multiline
+                                name="note"
+                                label="Note"
+                                value={order[params.id - 1]?.note || ''}
+                                onChange={(e) => handleChange(e, params)}
+                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()}
+                            />
+                        );
+                    }
+                }
             ]
             :
             [
-                { field: 'id', headerName: 'ID', width: 200 },
+                { field: 'id', headerName: 'ID', width: 200, align: "center", headerAlign: "center" },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -310,7 +351,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'price', headerName: 'Single price', width: 200,
+                    field: 'price', headerName: 'Single price', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -324,7 +365,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'quantity', headerName: 'Quantity', width: 200,
+                    field: 'quantity', headerName: 'Quantity', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -338,7 +379,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200,
+                    field: 'totalPrice', headerName: 'Total Price', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -352,7 +393,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
                             <>
@@ -382,7 +423,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'createdDate', headerName: 'Purchase Date', width: 200,
+                    field: 'createdDate', headerName: 'Purchase Date', width: 200, align: "center", display: "flex", headerAlign: "center",
                     renderCell: (params) => {
                         return (
                             <>
@@ -405,7 +446,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 200, align: "center", display: "flex", headerAlign: "center", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             <>
@@ -434,6 +475,24 @@ const AddOrder = () => {
                         );
                     }
                 },
+                {
+                    field: 'note', headerName: 'Note', width: 400, align: "center", display: "flex", headerAlign: "center",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                rows={2}
+                                fullWidth
+                                multiline
+                                name="note"
+                                label="Note"
+                                type="string"
+                                value={order[params.id - 1]?.note}
+                                onChange={(e) => handleChange(e, params)}
+                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()}
+                            />
+                        );
+                    }
+                }
             ];
 
         return columns;
@@ -443,15 +502,15 @@ const AddOrder = () => {
         const result = await dispatch(addOrder(updatedOrder));
         console.log(result)
 
-        setOrder([getEmptyOrder()]);
-        setUpdatedOrder({});
-
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
+            await dispatch(getItems());
             toast.success("Order is added.");
 
             setTimeout(() => {
                 navigate("/orders");
+                setUpdatedOrder({});
+                setOrder([getEmptyOrder()]);
                 removeSessionStorage('tempOrder');
                 removeSessionStorage('updateOrder');
             }, 2000);
@@ -465,9 +524,16 @@ const AddOrder = () => {
         if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
         else if (result.payload.status === 200) {
             toast.success("Order is updated.");
+            await dispatch(getItems());
             setEditable(!editable);
         }
 
+    }
+
+    const handleNewCustomer = async () => {
+        setSessionStorage('tempOrder', order);
+        setSessionStorage('tempUpdatedOrder', updatedOrder);
+        await dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }));
     }
 
     const handleCustomerAddedCB = () => {
@@ -489,6 +555,9 @@ const AddOrder = () => {
         setSessionStorage('tempOrder', updatedTempOrder);
         setSessionStorage('tempUpdatedOrder', tempUpdatedOrder);
     }
+
+    // console.log('pos :: order :: ', order);
+    // console.log('pos :: updatedOrder :: ', updatedOrder);
 
     useEffect(() => {
         const tempOrder = getSessionStorage('tempOrder');
@@ -550,6 +619,7 @@ const AddOrder = () => {
                     paymentMethods?.length &&
                     <DataGrid
                         rows={order}
+                        rowHeight={80}
                         // unstable_rowSpanning
                         showCellVerticalBorder
                         showColumnVerticalBorder

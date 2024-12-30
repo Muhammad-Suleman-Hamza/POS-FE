@@ -18,11 +18,10 @@ const ViewOrder = () => {
 
     const { orders } = useSelector((state) => state.order);
 
-
     const formatOrders = () => {
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
+        const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             newOrderStructure.push({
@@ -30,6 +29,7 @@ const ViewOrder = () => {
                 createdDate,
                 paymentMethod,
                 id: index + 1,
+                note: note[index],
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
@@ -88,7 +88,7 @@ const ViewOrder = () => {
                 }
             },
             {
-                field: 'customer', headerName: 'Customer', width: 100, valueGetter: (customer) => customer?.customerName,
+                field: 'customer', headerName: 'Customer', width: 150, valueGetter: (customer) => customer?.customerName,
                 renderCell: (params) => {
                     return (
                         <>
@@ -115,6 +115,16 @@ const ViewOrder = () => {
                     return (
                         <>
                             {params.id === 1 && order[params.id - 1]?.paymentMethod?.pk}
+                        </>
+                    );
+                }
+            },
+            {
+                field: 'note', headerName: 'Note', width: 400,
+                renderCell: (params) => {
+                    return (
+                        <>
+                            {order[params.id - 1]?.note}
                         </>
                     );
                 }
@@ -170,6 +180,7 @@ const ViewOrder = () => {
                     order.length &&
                     <DataGrid
                         rows={order}
+                        unstable_rowSpanning
                         showCellVerticalBorder
                         showColumnVerticalBorder
                         getRowId={(row) => row.id}
