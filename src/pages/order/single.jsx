@@ -180,7 +180,7 @@ const ViewOrder = () => {
                     order.length &&
                     <DataGrid
                         rows={order}
-                        unstable_rowSpanning
+                        // unstable_rowSpanning
                         showCellVerticalBorder
                         showColumnVerticalBorder
                         getRowId={(row) => row.id}

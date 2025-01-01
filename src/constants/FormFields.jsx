@@ -121,21 +121,6 @@ export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) =>
     return columns;
 }
 
-export const getSingleOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 200 },
-        { field: 'orderItem', headerName: 'Item', width: 200 },
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'quantity', headerName: 'Quantity', width: 200 },
-        { field: 'customerName', headerName: 'Customer', width: 200 },
-        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
-    ];
-
-    return columns;
-}
-
-
 export const getOrderFormFields = (items, customers) => {
     return [
         {
@@ -413,6 +398,15 @@ export const deleteButton = {
     sx: { gridColumn: "span 4" }
 }
 
+export const removeButton = {
+    title: "Edit",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'edit',
+    variant: "contained",
+    sx: { gridColumn: "span 4" }
+}
+
 export const backButton = {
     title: "Back",
     type: "button",
@@ -441,6 +435,15 @@ export const getRowButtons = (params, redirect = undefined, editOnClick = undefi
             {getUserPersmission('edit', 'table') && editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
             {getUserPersmission('delete', 'table') && deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
             {redirect && <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>}
+        </Box>
+    )
+}
+
+export const getRowRemoveButton = (params, deleteOnClick = undefined) => {
+
+    return (
+        <Box>
+            {deleteOnClick && <Button {...removeButton} onClick={() => deleteOnClick(params)}>Remove</Button>}
         </Box>
     )
 }
