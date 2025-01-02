@@ -17,7 +17,7 @@ export const initialValuesOfItem = {
 
 export const checkoutSchemaOfItem = yup.object().shape({
     price: yup.number().required("Required"),
-    quantity: yup.string().required("Required"),
+    quantity: yup.number().required("Required"),
     // weight: yup.string().required("Required"),
     itemName: yup.string().required("Required"),
     // dimensions: yup.string().required("Required"),

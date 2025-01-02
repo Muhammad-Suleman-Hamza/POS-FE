@@ -46,6 +46,7 @@ const AddOrder = () => {
     const { showCreateOrUpdateModal } = useSelector((state) => state.common);
 
     const [order, setOrder] = useState([]);
+    const [remove, setRemove] = useState(false);
     const [editable, setEditable] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState({
         note: [],
@@ -109,14 +110,7 @@ const AddOrder = () => {
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
             const newItem = { ...items.find((item) => item.pk === value) };
-            const checkItemExistInOrderOrNot = newOrderItems.find((order) => order.orderItem.pk === value);
-            
-            // if (checkItemExistInOrderOrNot) {
-            //     toast.warn('Item already exist in order');
-            //     return;
-            // }
 
-            console.log('pos :: checkItemExistInOrderOrNot :: ', checkItemExistInOrderOrNot);
             newItem['id'] = params.id;
             newOrderItems[params.id - 1]['quantity'] = 0;
             newOrderItems[params.id - 1]['orderItem'] = newItem;
@@ -154,9 +148,14 @@ const AddOrder = () => {
                 // current item
                 const localItem = { ...items.find((item) => item.pk === updatedOrder['orderItem'][params.id - 1]['pk']) };
 
+                // console.log('pos :: params.id - 1 :: ', params.id - 1);
+                console.log('pos :: orderItem :: ', updatedOrder['orderItem'][params.id - 1]);
+
+                // console.log('pos :: orderItem :: ', updatedOrder['orderItem']);
+
                 // item quantity check with required quantity
                 if (value > Number(localItem?.quantity)) {
-                    toast.error(`Only ${localItem?.quantity} remaining for ${localItem?.itemName}`);
+                    toast.error(`${localItem?.quantity || 0} remaining for ${localItem?.itemName}`);
                     return;
                 }
 
@@ -230,7 +229,13 @@ const AddOrder = () => {
                             >
                                 {
                                     items?.map((item) => (
-                                        <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
+                                        <MenuItem
+                                            key={item.pk}
+                                            value={item.pk}
+                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
+                                        >
+                                            {item.itemName}
+                                        </MenuItem>
                                     ))
                                 }
                             </TextField>
@@ -340,7 +345,7 @@ const AddOrder = () => {
                         );
                     }
                 },
-                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
+                { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ]
             :
             [
@@ -575,26 +580,25 @@ const AddOrder = () => {
     const deleteOnClick = ({ id }) => {
         if (order.length === 1) {
             toast.error('At least 1 item should be in order');
+            return;
         }
-        else {
-            const filteredOrders = order?.filter((o) => o.id !== id);
-            const filteredPrices = updatedOrder?.price.filter((p, index) => index !== id - 1);
-            const filteredQuantity = updatedOrder?.quantity.filter((q, index) => index !== id - 1);
 
-            setOrder([...filteredOrders]);
-            toast.success('Item removed from order');
-            setUpdatedOrder(
-                prevValues => ({
-                    ...prevValues,
-                    price: filteredPrices,
-                    orderItem: filteredOrders,
-                    quantity: filteredQuantity
-                })
-            );
-        }
-    }
+        const filteredPlaneOrders = order?.filter((o) => o.id !== id);
+        const filteredUpdatedOrderItem = updatedOrder?.orderItem.filter((o) => o.id !== id);
+        const filteredPrices = updatedOrder?.price.filter((_, index) => index !== id - 1);
+        const filteredQuantity = updatedOrder?.quantity.filter((_, index) => index !== id - 1);
 
-    console.log('pos :: order :: ', order);
+        setRemove(true);
+        setOrder(filteredPlaneOrders);
+        toast.success('Item removed from order');
+        setUpdatedOrder((prevValues) => ({
+            ...prevValues,
+            price: filteredPrices,
+            quantity: filteredQuantity,
+            orderItem: filteredUpdatedOrderItem,
+        }));
+    };
+    // console.log('pos :: order :: ', order);
     console.log('pos :: updatedOrder :: ', updatedOrder);
 
     useEffect(() => {
@@ -611,6 +615,22 @@ const AddOrder = () => {
         else if (id && source === 'edit' && !order?.length) formatOrders()
         else if (!id && source === 'add' && !order?.length) addNewItemInOrder();
     }, []);
+
+    useEffect(() => {
+        if (remove) {
+            setRemove(false);
+            const filteredOrders = order.map((o, index) => ({ ...o, id: index + 1 }));
+            const filteredUpdatedOrder = updatedOrder?.orderItem.map((o, index) => ({ ...o, id: index + 1 }));
+
+            setOrder([...filteredOrders]);
+            setUpdatedOrder(
+                prevValues => ({
+                    ...prevValues,
+                    orderItem: filteredUpdatedOrder,
+                })
+            );
+        }
+    }, [remove])
 
     return (
         <Box m="20px">
