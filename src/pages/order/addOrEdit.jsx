@@ -110,6 +110,7 @@ const AddOrder = () => {
             const newOrderItems = [...order];
             const newItem = { ...items.find((item) => item.pk === value) };
             const checkItemExistInOrderOrNot = newOrderItems.find((order) => order.orderItem.pk === value);
+            
             // if (checkItemExistInOrderOrNot) {
             //     toast.warn('Item already exist in order');
             //     return;
