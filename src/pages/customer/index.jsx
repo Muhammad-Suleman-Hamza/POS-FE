@@ -8,7 +8,7 @@ import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
-import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { DeleteConfirmation } from "../../components/DeleteConfirmation";
 import { getCustomers, deleteCustomer } from "../../store/slices/customer";
 import { editButton, getCustomerColumns } from '../../constants/FormFields';
 import {
