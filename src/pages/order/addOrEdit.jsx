@@ -47,6 +47,8 @@ const AddOrder = () => {
 
     const [order, setOrder] = useState([]);
     const [remove, setRemove] = useState(false);
+    const [update, setUpdate] = useState(false);
+    const [totalBill, setTotalBill] = useState(0);
     const [editable, setEditable] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState({
         note: [],
@@ -58,11 +60,14 @@ const AddOrder = () => {
     });
 
     const formatOrders = () => {
+        let tempTotalBill = 0;
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
         const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
+            tempTotalBill = tempTotalBill + (price[index] * quantity[index]);
+
             newOrderStructure.push({
                 customer,
                 createdDate,
@@ -76,6 +81,7 @@ const AddOrder = () => {
             })
             setOrder(newOrderStructure);
         }
+        setTotalBill(tempTotalBill);
         setUpdatedOrder(localOrder);
     }
 
@@ -148,11 +154,6 @@ const AddOrder = () => {
                 // current item
                 const localItem = { ...items.find((item) => item.pk === updatedOrder['orderItem'][params.id - 1]['pk']) };
 
-                // console.log('pos :: params.id - 1 :: ', params.id - 1);
-                console.log('pos :: orderItem :: ', updatedOrder['orderItem'][params.id - 1]);
-
-                // console.log('pos :: orderItem :: ', updatedOrder['orderItem']);
-
                 // item quantity check with required quantity
                 if (value > Number(localItem?.quantity)) {
                     toast.error(`${localItem?.quantity || 0} remaining for ${localItem?.itemName}`);
@@ -179,7 +180,7 @@ const AddOrder = () => {
             newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
         }
-        else if (name === 'totalPrice') result = Number(value);
+        else if (name === 'totalPrice') result = value;
         else return;
 
         if (name !== 'orderItem' && result) {
@@ -199,6 +200,7 @@ const AddOrder = () => {
 
                 newOrderItemsPrice[params.id - 1] = perPiecePrice;
                 orderUpdated[params.id - 1]['price'] = perPiecePrice;
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value);
 
                 setUpdatedOrder(prevValues => ({
                     ...prevValues,
@@ -209,6 +211,7 @@ const AddOrder = () => {
             setOrder(orderUpdated);
             if (name !== 'totalPrice') setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
         }
+        setUpdate(true);
     }
 
     const getSingleOrderColumns = () => {
@@ -308,7 +311,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 150, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             params.id === 1 && <TextField
@@ -349,7 +352,7 @@ const AddOrder = () => {
             ]
             :
             [
-                { field: 'id', headerName: 'ID', width: 200, align: "center" },
+                { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
                     field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
@@ -444,7 +447,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'createdDate', headerName: 'Purchase Date', width: 200, display: "flex",
+                    field: 'createdDate', headerName: 'Purchase Date', width: 150, display: "flex",
                     renderCell: (params) => {
                         return (
                             <>
@@ -467,7 +470,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 150, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             <>
@@ -521,7 +524,7 @@ const AddOrder = () => {
 
     const handleAddOrder = async () => {
         const result = await dispatch(addOrder(updatedOrder));
-        console.log(result)
+        console.log(`add order :: `, result);
 
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
@@ -537,7 +540,7 @@ const AddOrder = () => {
 
     const handleUpdateOrder = async () => {
         const result = await dispatch(updateOrder(updatedOrder));
-        console.log(result)
+        console.log(`update order :: `, result);
 
         if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
         else if (result.payload.status === 200) {
@@ -598,7 +601,8 @@ const AddOrder = () => {
             orderItem: filteredUpdatedOrderItem,
         }));
     };
-    // console.log('pos :: order :: ', order);
+
+    console.log('pos :: order :: ', order);
     console.log('pos :: updatedOrder :: ', updatedOrder);
 
     useEffect(() => {
@@ -632,10 +636,18 @@ const AddOrder = () => {
         }
     }, [remove])
 
+    useEffect(() => {
+        if (update) {
+            setUpdate(false);
+            const tempTotalBill = order.reduce((sum, o) => sum + (o.totalPrice || 0), 0);            
+            setTotalBill(tempTotalBill);
+        }
+    }, [update])
+
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={title} subtitle="" />
+                <Header title={title} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
                 <Box>
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>

@@ -2,28 +2,34 @@ import { tokens } from "../../theme";
 import Button from '@mui/material/Button';
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
+import { useReactToPrint } from 'react-to-print';
 import { Link, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { backButton, editButton } from '../../constants/FormFields'
 
 const ViewOrder = () => {
     const theme = useTheme();
     const { id } = useParams();
+    const printAbleComponent = useRef();
     const colors = tokens(theme.palette.mode);
+    const reactToPrintFn = useReactToPrint({ printAbleComponent });
 
     const [order, setOrder] = useState([]);
+    const [totalBill, setTotalBill] = useState(0);
     const [currentOrder, setCurrentOrder] = useState({});
 
     const { orders } = useSelector((state) => state.order);
 
     const formatOrders = () => {
+        let tempTotalBill = 0;
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
         const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
+            tempTotalBill = tempTotalBill + (price[index] * quantity[index]);
             newOrderStructure.push({
                 customer,
                 createdDate,
@@ -39,6 +45,7 @@ const ViewOrder = () => {
             setOrder(newOrderStructure);
         }
 
+        setTotalBill(tempTotalBill);
         setCurrentOrder(localOrder);
     }
 
@@ -141,10 +148,11 @@ const ViewOrder = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={`Order: ${id}`} subtitle="" />
+                <Header title={`Order: ${id}`} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
                 <Box>
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton}><Link to={`/orders/update/${currentOrder?.pk}`} style={{ ...backButton.anchorsx }}>Edit</Link></Button>
+                    <Button {...editButton} onClick={() => reactToPrintFn()}>Print</Button>
                 </Box>
             </Box>
             <Box
@@ -182,6 +190,7 @@ const ViewOrder = () => {
                         rows={order}
                         // unstable_rowSpanning
                         showCellVerticalBorder
+                        ref={printAbleComponent}
                         showColumnVerticalBorder
                         getRowId={(row) => row.id}
                         columns={getSingleOrderColumns()}
