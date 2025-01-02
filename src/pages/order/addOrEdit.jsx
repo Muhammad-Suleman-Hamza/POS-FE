@@ -339,7 +339,7 @@ const AddOrder = () => {
                         );
                     }
                 },
-                { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
+                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ]
             :
             [
