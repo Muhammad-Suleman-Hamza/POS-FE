@@ -7,7 +7,7 @@ import Header from "../../components/Header";
 import { updateUser } from "../../store/slices/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, useTheme, TextField, useMediaQuery } from '@mui/material';
-import { checkoutSchemaOfUser, editButton, userFormColumns } from '../../constants/FormFields';
+import { checkoutSchemaOfUser, editButton, getUserPersmission, userFormColumns } from '../../constants/FormFields';
 
 const Profile = () => {
   const theme = useTheme();
@@ -49,13 +49,17 @@ const Profile = () => {
     })
   }
 
+
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Profile" subtitle="" />
-        <Button {...editButton} onClick={closeEditing}>
-          {isDisabled ? 'Edit Profile' : 'Cancel'}
-        </Button>
+        {
+          getUserPersmission('edit', 'profile') &&
+          <Button {...editButton} onClick={closeEditing}>
+            {isDisabled ? 'Edit Profile' : 'Cancel'}
+          </Button>
+        }
       </Box>
       <Box
         m="8px 0 0 0"

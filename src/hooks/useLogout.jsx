@@ -5,7 +5,7 @@ import { clearUser } from '../store/slices/auth';
 import { clearItems } from '../store/slices/item';
 import { clearOrders } from '../store/slices/order';
 import { clearVendors } from '../store/slices/vendor';
-import { clearCsutomers } from '../store/slices/customer';
+import { clearCustomers } from '../store/slices/customer';
 import { clearLocalStorage, clearSessionStorage } from '../helpers/storage';
 
 export const useLogout = () => {
@@ -13,16 +13,20 @@ export const useLogout = () => {
     const navigate = useNavigate();
     
     const logout = () => {
-        toast.error("Logout successfully!");
-        dispatch(clearCsutomers());
+        toast.success("Logout successfully!");
+        emptyEveryThing();
+        navigate('/login');
+    }
+
+    const emptyEveryThing = () => {
+        dispatch(clearCustomers());
         dispatch(clearVendors());
         dispatch(clearOrders());
         dispatch(clearItems());
         dispatch(clearUser());
         clearSessionStorage();
         clearLocalStorage();
-        navigate('/login');
     }
 
-    return { logout };
+    return { logout, emptyEveryThing };
 };

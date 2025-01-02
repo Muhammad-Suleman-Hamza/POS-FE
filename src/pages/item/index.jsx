@@ -9,7 +9,13 @@ import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteItem, getItems } from "../../store/slices/item";
-import { toggleCreateOrUpdateModal, saveEntryToBeUpdated } from "../../store/slices/common";
+import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { 
+  toggleLoading,
+  saveEntryToBeUpdated, 
+  toggleCreateOrUpdateModal, 
+  toggleDeleteConfirmationModal 
+} from "../../store/slices/common";
 import {
   addButton,
   editButton,
@@ -17,7 +23,7 @@ import {
   itemFormColumns,
   initialValuesOfItem,
   checkoutSchemaOfItem,
-} from '../../constants/FormFields'
+} from '../../constants/FormFields';
 
 const Item = () => {
   const theme = useTheme();
@@ -31,11 +37,15 @@ const Item = () => {
     '',
     (params) => `${params.row.pk}`,
     (params) => dispatch(saveEntryToBeUpdated(params.row)),
-    async (params) => {
-      const result = await dispatch(deleteItem(params.row.pk))
-      if (result.payload.status === 200) toast.warning("Item is deleted.")
-    }
+    (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
+
+  const deleteCB = async () => {
+    await dispatch(toggleLoading());
+    const result = await dispatch(deleteItem(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Item is deleted.");
+    await dispatch(toggleLoading());
+  }
 
   useEffect(() => {
     if (!items) dispatch(getItems())
@@ -84,7 +94,7 @@ const Item = () => {
           showCellVerticalBorder
           showColumnVerticalBorder
           disableRowSelectionOnClick
-          getRowId={(row) => row.pk}
+          getRowId={(row) => row?.pk}
         />
         {/* Crate or Update item modal */}
         <BasicModal
@@ -93,7 +103,7 @@ const Item = () => {
         >
           <Form
             subtitle=""
-            source='item'
+            source="item"
             inputsFields={itemFormColumns}
             checkoutSchema={checkoutSchemaOfItem}
             button={showCreateOrUpdateModal.create ? addButton : editButton}
@@ -101,6 +111,8 @@ const Item = () => {
             initialValues={showCreateOrUpdateModal.create ? initialValuesOfItem : entryToBeUpdateOrDelete}
           />
         </BasicModal>
+
+        <DeleteConfirmation cb={deleteCB} />
       </Box>
     </Box>
   );

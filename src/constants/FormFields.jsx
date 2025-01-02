@@ -2,12 +2,14 @@ import * as yup from 'yup';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import { paymentMethods } from './generic';
+import { paymentMethods, rights } from './generic';
+import { getSessionStorage } from '../helpers/storage';
 
 // Item
 export const initialValuesOfItem = {
     price: "",
     weight: "",
+    quantity: "",
     itemName: "",
     dimensions: "",
     measuringUnit: "",
@@ -15,24 +17,26 @@ export const initialValuesOfItem = {
 
 export const checkoutSchemaOfItem = yup.object().shape({
     price: yup.number().required("Required"),
-    weight: yup.string().required("Required"),
+    quantity: yup.string().required("Required"),
+    // weight: yup.string().required("Required"),
     itemName: yup.string().required("Required"),
-    dimensions: yup.string().required("Required"),
-    measuringUnit: yup.string().required("Required"),
+    // dimensions: yup.string().required("Required"),
+    // measuringUnit: yup.string().required("Required"),
 })
 
 export const getItemColumns = (source = '', redirect, editOnClick, deleteOnClick) => {
     const columns = [
-        { field: 'pk', headerName: 'ID', width: 200 },
+        { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'itemName', headerName: 'Name', width: 200 },
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'weight', headerName: 'Weight', width: 200 },
-        { field: 'dimensions', headerName: 'Dimensions', width: 200 },
-        { field: 'measuringUnit', headerName: 'Measuring Unit', width: 200 },
+        { field: 'price', headerName: 'Price', width: 100 },
+        { field: 'quantity', headerName: 'Quantity', width: 100 },
+        { field: 'weight', headerName: 'Weight', width: 100 },
+        { field: 'dimensions', headerName: 'Dimensions', width: 100 },
+        { field: 'measuringUnit', headerName: 'Measuring Unit', width: 100 },
     ];
 
     if (source !== 'single') {
-        columns.push({ field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
+        columns.push({ field: 'operations', headerName: 'Operations', width: 280, renderCell: (params) => getRowButtons(params, redirect, editOnClick, deleteOnClick) })
     }
     return columns;
 }
@@ -51,6 +55,14 @@ export const itemFormColumns = [
         label: "Price",
         type: "number",
         fullWidth: true,
+        variant: "filled",
+        sx: { gridColumn: "span 2" },
+    },
+    {
+        type: "number",
+        fullWidth: true,
+        name: "quantity",
+        label: "Quantity",
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },
@@ -99,30 +111,15 @@ export const checkoutSchemaOfOrder = yup.object().shape({
 
 export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
-        { field: 'pk', headerName: 'ID', width: 200 },
+        { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName },
-        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod.name },
-        { field: 'operations', headerName: 'Operations', width: 300, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
+        { field: 'createdDate', headerName: 'Purchase Date', width: 180 },
+        { field: 'paymentMethod', headerName: 'Payment method', width: 120, valueGetter: (paymentMethod) => paymentMethod.name },
+        { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
     ];
 
     return columns;
 }
-
-export const getSingleOrderColumns = (source, redirect, editOnClick, deleteOnClick) => {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 200 },
-        { field: 'orderItem', headerName: 'Item', width: 200 },
-        { field: 'price', headerName: 'Price', width: 200 },
-        { field: 'quantity', headerName: 'Quantity', width: 200 },
-        { field: 'customerName', headerName: 'Customer', width: 200 },
-        { field: 'createdDate', headerName: 'Purchase Date', width: 200 },
-        { field: 'paymentMethodName', headerName: 'Payment method', width: 200 },
-    ];
-
-    return columns;
-}
-
 
 export const getOrderFormFields = (items, customers) => {
     return [
@@ -211,8 +208,8 @@ export const checkoutSchemaOfCustomer = yup.object().shape({
 export const getCustomerColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'customerName', headerName: 'Name', width: 200 },
-        { field: 'contact', headerName: 'Contact', width: 200 },
-        { field: 'address', headerName: 'Address', width: 200 },
+        { field: 'contact', headerName: 'Contact', width: 100 },
+        { field: 'address', headerName: 'Address', width: 300 },
     ];
 
     if (source !== 'single') {
@@ -269,9 +266,9 @@ export const checkoutSchemaOfVendor = yup.object().shape({
 export const getVendorColumns = (source, redirect, editOnClick, deleteOnClick) => {
     const columns = [
         { field: 'vendorName', headerName: 'Name', width: 200 },
-        { field: 'contact', headerName: 'contact', width: 200 },
-        { field: 'comapny', headerName: 'Comapny', width: 200 },
-        { field: 'address', headerName: 'Address', width: 200 },
+        { field: 'contact', headerName: 'contact', width: 100 },
+        { field: 'comapny', headerName: 'Comapny', width: 100 },
+        { field: 'address', headerName: 'Address', width: 300 },
     ];
 
     if (source !== 'single') {
@@ -401,6 +398,15 @@ export const deleteButton = {
     sx: { gridColumn: "span 4" }
 }
 
+export const removeButton = {
+    title: "Edit",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'edit',
+    variant: "contained",
+    sx: { gridColumn: "span 4" }
+}
+
 export const backButton = {
     title: "Back",
     type: "button",
@@ -412,12 +418,48 @@ export const backButton = {
     anchorsx: { color: "black", textDecoration: "none" }
 }
 
+export const datePickerButton = {
+    title: "Pick Date",
+    type: "submit",
+    color: "secondary",
+    buttonsource: 'pickDate',
+    variant: "contained",
+    sx: { gridColumn: "span 4" },
+    anchorsx: { color: "black", textDecoration: "none" }
+}
+
 export const getRowButtons = (params, redirect = undefined, editOnClick = undefined, deleteOnClick = undefined) => {
+
     return (
         <Box>
-            {editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
-            {deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
+            {getUserPersmission('edit', 'table') && editOnClick && <Button {...editButton} onClick={() => editOnClick(params)}>Edit</Button>}
+            {getUserPersmission('delete', 'table') && deleteOnClick && <Button {...deleteButton} onClick={() => deleteOnClick(params)}>Delete</Button>}
             {redirect && <Button {...viewButton}><Link to={redirect(params)} style={{ ...viewButton.anchorsx }}>View</Link></Button>}
         </Box>
     )
+}
+
+export const getRowRemoveButton = (params, deleteOnClick = undefined) => {
+
+    return (
+        <Box>
+            {deleteOnClick && <Button {...removeButton} onClick={() => deleteOnClick(params)}>Remove</Button>}
+        </Box>
+    )
+}
+
+export const getUserPersmission = (access, flow) => {
+    const user = getSessionStorage('user');
+    const right = user?.rights;
+    let result = false;
+
+    if (flow === 'table') {
+        if (access === 'delete') result = right === rights.super || right === rights.admin;
+        else if (access === 'edit') result = right === rights.super || right === rights.admin || right === rights.manager;
+    }
+    else if (flow === 'profile') {
+        if (access === 'edit') result = right === rights.super || right === rights.admin;
+    }
+
+    return result;
 }

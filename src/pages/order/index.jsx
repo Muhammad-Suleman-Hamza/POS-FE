@@ -9,6 +9,8 @@ import { Box, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteOrder, getOrders } from "../../store/slices/order";
 import { addButton, getOrderColumns } from '../../constants/FormFields';
+import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { toggleLoading, toggleDeleteConfirmationModal } from "../../store/slices/common";
 
 const Order = () => {
   const theme = useTheme();
@@ -16,16 +18,22 @@ const Order = () => {
   const colors = tokens(theme.palette.mode);
 
   const { orders } = useSelector((state) => state.order);
+  const { entryToBeUpdateOrDelete } = useSelector((state) => state.common);
 
   const orderColumns = getOrderColumns(
     '',
     (params) => `view/${params.row.pk}`,
     undefined,
-    async (params) => {
-      const result = await dispatch(deleteOrder(params.row.pk))
-      if (result.payload.status === 200) toast.warning("Order is deleted.")
-    }
+    (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
+
+
+  const deleteCB = async () => {
+    await dispatch(toggleLoading()); 
+    const result = await dispatch(deleteOrder(entryToBeUpdateOrDelete.pk));
+    if (result.payload.status === 200) toast.success("Order is deleted.");
+      await dispatch(toggleLoading()); 
+  }
 
   useEffect(() => {
     if (!orders) dispatch(getOrders());
@@ -73,8 +81,10 @@ const Order = () => {
           showCellVerticalBorder
           showColumnVerticalBorder
           disableRowSelectionOnClick
-          getRowId={(row) => row.pk}
+          getRowId={(row) => row?.pk}
         />
+
+        <DeleteConfirmation cb={deleteCB} />
       </Box>
     </Box>
   );

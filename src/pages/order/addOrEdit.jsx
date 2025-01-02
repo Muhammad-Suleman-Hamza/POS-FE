@@ -1,15 +1,35 @@
-import { useEffect, useState } from "react";
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
+import Form from "../../components/Form";
 import Button from '@mui/material/Button';
 import { DataGrid } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { addOrder } from "../../store/slices/order";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import BasicModal from "../../components/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { addOrder, updateOrder } from "../../store/slices/order";
 import { Box, MenuItem, TextField, useTheme } from "@mui/material";
-import { backButton, editButton, getEmptyOrder } from '../../constants/FormFields'
+import { toggleCreateOrUpdateModal } from "../../store/slices/common";
+import {
+    getLocalStorage,
+    setSessionStorage,
+    getSessionStorage,
+    removeSessionStorage,
+} from "../../helpers/storage";
+import {
+    addButton,
+    backButton,
+    editButton,
+    getEmptyOrder,
+    customerFormColumns,
+    initialValuesOfCustomer,
+    checkoutSchemaOfCustomer,
+    getRowButtons,
+    getRowRemoveButton
+} from '../../constants/FormFields'
+import { getItems } from "../../store/slices/item";
 
 const AddOrder = () => {
     const theme = useTheme();
@@ -23,11 +43,12 @@ const AddOrder = () => {
     const { items } = useSelector((state) => state.item);
     const { orders } = useSelector((state) => state.order);
     const { customers } = useSelector((state) => state.customer);
+    const { showCreateOrUpdateModal } = useSelector((state) => state.common);
 
     const [order, setOrder] = useState([]);
     const [editable, setEditable] = useState(false);
-    // const [order, setOrder] = useState([getEmptyOrder()]);
     const [updatedOrder, setUpdatedOrder] = useState({
+        note: [],
         price: [],
         customer: {},
         quantity: [],
@@ -38,7 +59,7 @@ const AddOrder = () => {
     const formatOrders = () => {
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
+        const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             newOrderStructure.push({
@@ -46,6 +67,7 @@ const AddOrder = () => {
                 createdDate,
                 paymentMethod,
                 id: index + 1,
+                note: note[index],
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
@@ -59,13 +81,14 @@ const AddOrder = () => {
     const addNewItemInOrder = () => {
         const { customer, createdDate, paymentMethod } = updatedOrder;
         const newOrder = {
+            note: '',
             price: 0,
             customer,
             quantity: 0,
             orderItem: '',
             totalPrice: 0,
             paymentMethod,
-            id: order?.length || 0 + 1
+            id: order?.length + 1
         };
 
         if (source === 'edit') {
@@ -85,8 +108,14 @@ const AddOrder = () => {
         else if (name === 'paymentMethod') result = paymentMethods.find((paymentMethod) => paymentMethod.pk === value)
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
-            const newItem = { ...items.find((order) => order.pk === value) };
+            const newItem = { ...items.find((item) => item.pk === value) };
+            const checkItemExistInOrderOrNot = newOrderItems.find((order) => order.orderItem.pk === value);
+            if (checkItemExistInOrderOrNot) {
+                toast.warn('Item already exist in order');
+                return;
+            }
 
+            console.log('pos :: checkItemExistInOrderOrNot :: ', checkItemExistInOrderOrNot);
             newItem['id'] = params.id;
             newOrderItems[params.id - 1]['quantity'] = 0;
             newOrderItems[params.id - 1]['orderItem'] = newItem;
@@ -95,8 +124,8 @@ const AddOrder = () => {
 
             result = newOrderItems;
 
-            const updatedOrderPrices = updatedOrder?.price;
-            const updatedOrderItems = updatedOrder?.orderItem;
+            const updatedOrderPrices = [...updatedOrder?.price];
+            const updatedOrderItems = [...updatedOrder?.orderItem];
 
             updatedOrderItems[params.id - 1] = newItem;
             updatedOrderPrices[params.id - 1] = newItem?.price;
@@ -113,7 +142,39 @@ const AddOrder = () => {
             newOrderItemsPrice[params.id - 1] = Number(value);
             result = newOrderItemsPrice;
         }
+        else if (name === 'note') {
+            const newOrderItemsNote = [...updatedOrder.note];
+            newOrderItemsNote[params.id - 1] = value;
+            result = newOrderItemsNote;
+        }
         else if (name === 'quantity') {
+            if (updatedOrder?.orderItem?.length) {
+                const tempUpdatedOrder = JSON.parse(JSON.stringify(updatedOrder));
+                // current item
+                const localItem = { ...items.find((item) => item.pk === updatedOrder['orderItem'][params.id - 1]['pk']) };
+
+                // item quantity check with required quantity
+                if (value > Number(localItem?.quantity)) {
+                    toast.error(`Only ${localItem?.quantity} remaining for ${localItem?.itemName}`);
+                    return;
+                }
+
+                if (source === 'edit') {
+                    const tempOrders = getLocalStorage('orders');
+                    const tempCurrentOrder = tempOrders.find((order) => order.pk === id);
+                    const tempCurrentOrderItemQuantity = tempCurrentOrder['quantity'][params.id - 1];
+
+                    if (tempCurrentOrderItemQuantity) localItem['quantity'] = (tempCurrentOrderItemQuantity + localItem?.quantity) - value;
+                    else localItem['quantity'] = localItem?.quantity - value;
+                }
+                else {
+                    localItem['quantity'] = localItem?.quantity - value;
+                }
+
+                tempUpdatedOrder['orderItem'][params.id - 1] = localItem;
+                setUpdatedOrder(tempUpdatedOrder);
+            }
+
             const newOrderItemsQuantity = [...updatedOrder.quantity];
             newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
@@ -153,9 +214,9 @@ const AddOrder = () => {
     const getSingleOrderColumns = () => {
         const columns = source === 'add' ?
             [
-                { field: 'id', headerName: 'ID', width: 200 },
+                { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -176,7 +237,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'price', headerName: 'Single price', width: 200,
+                    field: 'price', headerName: 'Single price', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -190,7 +251,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'quantity', headerName: 'Quantity', width: 200,
+                    field: 'quantity', headerName: 'Quantity', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -204,7 +265,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200,
+                    field: 'totalPrice', headerName: 'Total Price', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -218,10 +279,11 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
-                            params.id === 1 && <TextField
+                            params.id === 1 &&
+                            <TextField
                                 select
                                 fullWidth
                                 type="string"
@@ -229,6 +291,7 @@ const AddOrder = () => {
                                 onChange={(e) => handleChange(e, params)}
                                 value={order[params.id - 1]?.customer?.pk}
                             >
+                                <MenuItem key={'new'} value={'new'} onClick={handleNewCustomer}>Add Customer</MenuItem>
                                 {
                                     customers?.map((customer) => (
                                         <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
@@ -239,7 +302,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             params.id === 1 && <TextField
@@ -259,12 +322,30 @@ const AddOrder = () => {
                         );
                     }
                 },
+                {
+                    field: 'note', headerName: 'Note', width: 400, display: "flex",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                rows={2}
+                                fullWidth
+                                multiline
+                                name="note"
+                                label="Note"
+                                value={order[params.id - 1]?.note || ''}
+                                onChange={(e) => handleChange(e, params)}
+                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()}
+                            />
+                        );
+                    }
+                },
+                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ]
             :
             [
-                { field: 'id', headerName: 'ID', width: 200 },
+                { field: 'id', headerName: 'ID', width: 200, align: "center" },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -285,7 +366,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'price', headerName: 'Single price', width: 200,
+                    field: 'price', headerName: 'Single price', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -299,7 +380,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'quantity', headerName: 'Quantity', width: 200,
+                    field: 'quantity', headerName: 'Quantity', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -313,7 +394,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200,
+                    field: 'totalPrice', headerName: 'Total Price', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -327,7 +408,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
                             <>
@@ -357,7 +438,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'createdDate', headerName: 'Purchase Date', width: 200,
+                    field: 'createdDate', headerName: 'Purchase Date', width: 200, display: "flex",
                     renderCell: (params) => {
                         return (
                             <>
@@ -380,7 +461,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             <>
@@ -409,6 +490,24 @@ const AddOrder = () => {
                         );
                     }
                 },
+                {
+                    field: 'note', headerName: 'Note', width: 400, display: "flex",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                rows={2}
+                                fullWidth
+                                multiline
+                                name="note"
+                                label="Note"
+                                type="string"
+                                value={order[params.id - 1]?.note}
+                                onChange={(e) => handleChange(e, params)}
+                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()}
+                            />
+                        );
+                    }
+                }
             ];
 
         return columns;
@@ -418,38 +517,99 @@ const AddOrder = () => {
         const result = await dispatch(addOrder(updatedOrder));
         console.log(result)
 
-        setOrder([getEmptyOrder()]);
-        setUpdatedOrder({});
-
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
+            removeSessionStorage('updateOrder');
+            removeSessionStorage('tempOrder');
             toast.success("Order is added.");
-
-            setTimeout(() => {
-                navigate("/orders");
-            }, 2000);
+            await dispatch(getItems());
+            setOrder([getEmptyOrder()]);
+            setUpdatedOrder({});
+            navigate("/orders");
         }
     }
 
     const handleUpdateOrder = async () => {
-        const result = await dispatch(updatedOrder(updatedOrder));
+        const result = await dispatch(updateOrder(updatedOrder));
         console.log(result)
 
         if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
         else if (result.payload.status === 200) {
             toast.success("Order is updated.");
+            await dispatch(getItems());
             setEditable(!editable);
+            navigate("/orders");
         }
 
     }
 
+    const handleNewCustomer = async () => {
+        // upon adding new customer, order state was getting empty
+        // To handle that issue i have added order temporary in sesson storage
+        setSessionStorage('tempOrder', order);
+        setSessionStorage('tempUpdatedOrder', updatedOrder);
+        await dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }));
+    }
+
+    const handleCustomerAddedCB = () => {
+        const tempOrder = getSessionStorage('tempOrder');
+        const tempCustomer = getLocalStorage('customers');
+        const tempUpdatedOrder = getSessionStorage('tempUpdatedOrder');
+
+        const newCustomer = tempCustomer[customers.length];
+
+        tempUpdatedOrder['customer'] = newCustomer;
+        const updatedTempOrder = tempOrder.map(o => ({
+            ...o,
+            customer: newCustomer
+        }));
+
+        setOrder(updatedTempOrder);
+        setUpdatedOrder(tempUpdatedOrder);
+
+        setSessionStorage('tempOrder', updatedTempOrder);
+        setSessionStorage('tempUpdatedOrder', tempUpdatedOrder);
+    }
+
+    const deleteOnClick = ({ id }) => {
+        if (order.length === 1) {
+            toast.error('At least 1 item should be in order');
+        }
+        else {
+            const filteredOrders = order?.filter((o) => o.id !== id);
+            const filteredPrices = updatedOrder?.price.filter((p, index) => index !== id - 1);
+            const filteredQuantity = updatedOrder?.quantity.filter((q, index) => index !== id - 1);
+
+            setOrder([...filteredOrders]);
+            toast.success('Item removed from order');
+            setUpdatedOrder(
+                prevValues => ({
+                    ...prevValues,
+                    price: filteredPrices,
+                    orderItem: filteredOrders,
+                    quantity: filteredQuantity
+                })
+            );
+        }
+    }
+
+    console.log('pos :: order :: ', order);
+    console.log('pos :: updatedOrder :: ', updatedOrder);
+
     useEffect(() => {
-        if (id && source === 'edit' && !order?.length) formatOrders()
+        const tempOrder = getSessionStorage('tempOrder');
+        const tempUpdatedOrder = getSessionStorage('tempUpdatedOrder');
+        if (tempOrder) {
+            setOrder(tempOrder);
+            setUpdatedOrder(tempUpdatedOrder);
+            setTimeout(() => {
+                removeSessionStorage('tempOrder');
+                removeSessionStorage('tempUpdatedOrder');
+            }, 2000);
+        }
+        else if (id && source === 'edit' && !order?.length) formatOrders()
         else if (!id && source === 'add' && !order?.length) addNewItemInOrder();
     }, []);
-
-    console.log('order :: ', order);
-    console.log('updatedOrder :: ', updatedOrder);
 
     return (
         <Box m="20px">
@@ -496,6 +656,7 @@ const AddOrder = () => {
                     paymentMethods?.length &&
                     <DataGrid
                         rows={order}
+                        rowHeight={80}
                         // unstable_rowSpanning
                         showCellVerticalBorder
                         showColumnVerticalBorder
@@ -504,6 +665,23 @@ const AddOrder = () => {
                     />
                 }
             </Box>
+
+            {/* customer modal */}
+            <BasicModal
+                open={showCreateOrUpdateModal.create}
+                handleClose={() => dispatch(toggleCreateOrUpdateModal())}
+            >
+                <Form
+                    subtitle=""
+                    source="customer"
+                    button={addButton}
+                    title={"Create Customer"}
+                    cb={handleCustomerAddedCB}
+                    inputsFields={customerFormColumns}
+                    initialValues={initialValuesOfCustomer}
+                    checkoutSchema={checkoutSchemaOfCustomer}
+                />
+            </BasicModal>
         </Box>
     );
 };

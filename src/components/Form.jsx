@@ -8,11 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addItem, updateItem } from '../store/slices/item';
 import { addOrder, updateOrder } from '../store/slices/order';
 import { addVendor, updateVendor } from '../store/slices/vendor';
-import { toggleCreateOrUpdateModal } from '../store/slices/common';
 import { addCustomer, updateCustomer } from '../store/slices/customer';
 import { Box, Button, TextField, useMediaQuery, MenuItem } from '@mui/material'
+import { toggleLoading, toggleCreateOrUpdateModal } from '../store/slices/common';
 
-const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
+const Form = ({ cb = undefined, title, button, source = '', subTitle, initialValues, checkoutSchema, inputsFields }) => {
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
@@ -26,12 +26,13 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
   const handleFormSubmit = async (values) => {
     console.log('values :: ', values);
 
-    let toastText = undefined;
     let result = undefined;
+    let toastText = undefined;
 
     if (source === 'order') values = combineOrderAttributes(values);
 
     if (button.buttonsource === 'add') {
+      await dispatch(toggleLoading());
       if (source === 'item') {
         result = await dispatch(addItem(values));
         toastText = "Item is added.";
@@ -48,8 +49,10 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
         result = await dispatch(addVendor(values));
         toastText = "Vendor is added.";
       }
+      await dispatch(toggleLoading());
     }
     else if (button.buttonsource === 'edit') {
+      await dispatch(toggleLoading());
       if (source === 'item') {
         result = await dispatch(updateItem(values));
         toastText = "Item is updated.";
@@ -66,12 +69,17 @@ const Form = ({ title, button, source = '', subTitle, initialValues, checkoutSch
         result = await dispatch(updateVendor(values));
         toastText = "Vendor is updated.";
       }
+      await dispatch(toggleLoading());
     }
 
     if (!result || result?.payload === undefined) toast.error(`Unable to ${button.buttonsource} ${source}`);
     else if (result.payload.status === 200) {
       dispatch(toggleCreateOrUpdateModal())
       toast.success(toastText);
+    }
+
+    if (cb && typeof cb === 'function') {
+      cb();
     }
 
     console.log(result)

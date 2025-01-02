@@ -51,7 +51,7 @@ export const customerSlice = createSlice({
   name: 'customer',
   initialState,
   reducers: {
-    clearCsutomers: (state) => {
+    clearCustomers: (state) => {
       state.customers = undefined
     }
   },
@@ -82,6 +82,6 @@ export const customerSlice = createSlice({
   }
 })
 
-export const { clearCsutomers } = customerSlice.actions
+export const { clearCustomers } = customerSlice.actions
 
 export default customerSlice.reducer
