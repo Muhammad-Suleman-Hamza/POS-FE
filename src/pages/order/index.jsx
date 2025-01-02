@@ -9,7 +9,7 @@ import { Box, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteOrder, getOrders } from "../../store/slices/order";
 import { addButton, getOrderColumns } from '../../constants/FormFields';
-import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { DeleteConfirmation } from "../../components/DeleteConfirmation";
 import { toggleLoading, toggleDeleteConfirmationModal } from "../../store/slices/common";
 
 const Order = () => {

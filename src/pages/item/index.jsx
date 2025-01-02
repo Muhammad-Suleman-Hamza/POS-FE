@@ -9,7 +9,7 @@ import { Box, useTheme } from "@mui/material";
 import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteItem, getItems } from "../../store/slices/item";
-import { DeleteConfirmation } from "../../components/deleteComfirmation";
+import { DeleteConfirmation } from "../../components/DeleteConfirmation";
 import { 
   toggleLoading,
   saveEntryToBeUpdated, 
