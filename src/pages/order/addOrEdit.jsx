@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Form from "../../components/Form";
@@ -70,14 +71,14 @@ const AddOrder = () => {
 
             newOrderStructure.push({
                 customer,
-                createdDate,
                 paymentMethod,
                 id: index + 1,
                 note: note[index],
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
-                totalPrice: price[index] * quantity[index]
+                totalPrice: price[index] * quantity[index],
+                createdDate: format(createdDate, "yyyy-MM-dd")
             })
             setOrder(newOrderStructure);
         }
@@ -111,6 +112,7 @@ const AddOrder = () => {
         let result = undefined;
         const { name, value } = event.target;
 
+        // if (name === 'createdDate') result = value;
         if (name === 'customer') result = customers.find((customer) => customer.pk === value)
         else if (name === 'paymentMethod') result = paymentMethods.find((paymentMethod) => paymentMethod.pk === value)
         else if (name === 'orderItem') {
@@ -367,7 +369,13 @@ const AddOrder = () => {
                             >
                                 {
                                     items?.map((item) => (
-                                        <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
+                                        <MenuItem
+                                            key={item.pk}
+                                            value={item.pk}
+                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
+                                        >
+                                            {item.itemName}
+                                        </MenuItem>
                                     ))
                                 }
                             </TextField>
@@ -451,20 +459,7 @@ const AddOrder = () => {
                     renderCell: (params) => {
                         return (
                             <>
-                                {
-                                    params.id === 1 ?
-                                        <TextField
-                                            fullWidth
-                                            type="date"
-                                            name="createdDate"
-                                            value={order[params.id - 1]?.createdDate}
-                                            onChange={(e) => handleChange(e, params)}
-                                        />
-                                        :
-                                        <>
-                                            {params.id === 1 && order[params.id - 1]?.createdDate}
-                                        </>
-                                }
+                                {params.id === 1 && format(order[params.id - 1]?.createdDate, "dd-MM-yyyy hh:mm:ss a")}
                             </>
                         );
                     }
@@ -516,7 +511,8 @@ const AddOrder = () => {
                             />
                         );
                     }
-                }
+                },
+                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ];
 
         return columns;
@@ -524,7 +520,6 @@ const AddOrder = () => {
 
     const handleAddOrder = async () => {
         const result = await dispatch(addOrder(updatedOrder));
-        console.log(`add order :: `, result);
 
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
@@ -534,7 +529,7 @@ const AddOrder = () => {
             await dispatch(getItems());
             setOrder([getEmptyOrder()]);
             setUpdatedOrder({});
-            navigate("/orders");
+            navigate(`/orders/view/${result.payload.data.pk}`);
         }
     }
 
@@ -547,7 +542,7 @@ const AddOrder = () => {
             toast.success("Order is updated.");
             await dispatch(getItems());
             setEditable(!editable);
-            navigate("/orders");
+            navigate(`/orders/view/${id}`);
         }
 
     }
@@ -639,7 +634,7 @@ const AddOrder = () => {
     useEffect(() => {
         if (update) {
             setUpdate(false);
-            const tempTotalBill = order.reduce((sum, o) => sum + (o.totalPrice || 0), 0);            
+            const tempTotalBill = order.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
             setTotalBill(tempTotalBill);
         }
     }, [update])

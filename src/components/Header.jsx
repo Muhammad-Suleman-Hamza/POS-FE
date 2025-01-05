@@ -13,15 +13,15 @@ const Header = ({ title, subtitle, parentClass, titleClass = '', subTitleClass =
         variant="h2"
         fontWeight="bold"
         sx={{ mb: "5px" }}
-        className={titleClass}
         color={colors.grey[100]}
+        className={`${titleClass} page-title`}
       >
         {title}
       </Typography>
       <Typography 
         variant="h4" 
-        className={subTitleClass}
         color={colors.greenAccent[400]}
+        className={`${subTitleClass} page-sub-title`}
       >
         {subtitle}
       </Typography>

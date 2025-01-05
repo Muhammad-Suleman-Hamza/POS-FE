@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { format } from 'date-fns';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
@@ -113,7 +114,7 @@ export const getOrderColumns = (source, redirect, editOnClick, deleteOnClick) =>
     const columns = [
         { field: 'pk', headerName: 'ID', width: 100 },
         { field: 'customer', headerName: 'Customer', width: 200, valueGetter: (customer) => customer.customerName },
-        { field: 'createdDate', headerName: 'Purchase Date', width: 180 },
+        { field: 'createdDate', headerName: 'Purchase Date', width: 180, valueGetter: (createdDate) =>  format(createdDate, "dd-MM-yyyy hh:mm:ss a")},
         { field: 'paymentMethod', headerName: 'Payment method', width: 120, valueGetter: (paymentMethod) => paymentMethod.name },
         { field: 'operations', headerName: 'Operations', width: 200, renderCell: (params) => getRowButtons(params, redirect, undefined, deleteOnClick) }
     ];
