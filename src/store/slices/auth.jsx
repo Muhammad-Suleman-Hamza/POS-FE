@@ -1,4 +1,4 @@
-import axios from 'axios';
+import interceptor from '../../helpers/interceptor';
 import { endpoints } from '../../constants/apiEndpoints';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getSessionStorage, setSessionStorage } from '../../helpers/storage';
@@ -11,7 +11,7 @@ export const login = createAsyncThunk(
   '/user/get',
   async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${endpoints.user}/user/get`, data);
+      const response = await interceptor.post(`${endpoints.user}/user/get`, data);
       return response;
     } catch (error) {
       if (error.response) {
@@ -27,7 +27,7 @@ export const login = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   '/user/update',
   async (data) => {
-    const user = axios.post(`${endpoints.user}/user/update`, data)
+    const user = interceptor.post(`${endpoints.user}/user/update`, data)
     return user;
   }
 )

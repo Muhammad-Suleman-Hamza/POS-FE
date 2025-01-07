@@ -1,4 +1,4 @@
-import axios from 'axios';
+import interceptor from '../../helpers/interceptor';
 import { endpoints } from '../../constants/apiEndpoints';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
@@ -10,7 +10,7 @@ const initialState = {
 export const getVendor = createAsyncThunk(
   '/vendor/get',
   async (pk) => {
-    const response = axios.post(`${endpoints.vendor}/vendor/get`, pk);
+    const response = interceptor.post(`${endpoints.vendor}/vendor/get`, pk);
     return response;
   }
 )
@@ -18,7 +18,7 @@ export const getVendor = createAsyncThunk(
 export const getVendors = createAsyncThunk(
   '/vendor/all',
   async () => {
-    const response = axios.get(`${endpoints.vendor}/vendor/all`);
+    const response = interceptor.get(`${endpoints.vendor}/vendor/all`);
     return response;
   }
 )
@@ -26,7 +26,7 @@ export const getVendors = createAsyncThunk(
 export const addVendor = createAsyncThunk(
   '/vendor/add',
   async (vendor) => {
-    const response = axios.post(`${endpoints.vendor}/vendor/add`, vendor);
+    const response = interceptor.post(`${endpoints.vendor}/vendor/add`, vendor);
     return response;
   }
 )
@@ -34,7 +34,7 @@ export const addVendor = createAsyncThunk(
 export const updateVendor = createAsyncThunk(
   '/vendor/update',
   async (vendor) => {
-    const response = axios.post(`${endpoints.vendor}/vendor/update`, vendor);
+    const response = interceptor.post(`${endpoints.vendor}/vendor/update`, vendor);
     return response;
   }
 )
@@ -42,7 +42,7 @@ export const updateVendor = createAsyncThunk(
 export const deleteVendor = createAsyncThunk(
   '/vendor/delete',
   async (pk) => {
-    const response = axios.post(`${endpoints.vendor}/vendor/delete`, { pk });
+    const response = interceptor.post(`${endpoints.vendor}/vendor/delete`, { pk });
     return response;
   }
 )
