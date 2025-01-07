@@ -334,11 +334,13 @@ export const userFormColumns = [
         name: "email",
         label: "Email",
         type: "string",
+        required: true,
         fullWidth: true,
         variant: "filled",
         sx: { gridColumn: "span 2" },
     },
     {
+        required: true,
         fullWidth: true,
         type: "password",
         variant: "filled",
@@ -347,6 +349,7 @@ export const userFormColumns = [
         sx: { gridColumn: "span 2" },
     },
     {
+        required: true,
         fullWidth: true,
         type: "password",
         variant: "filled",

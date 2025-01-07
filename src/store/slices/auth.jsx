@@ -47,8 +47,10 @@ export const authSlice = createSlice({
       setSessionStorage('sessionToken', message.sessionToken)
     })
     builder.addCase(updateUser.fulfilled, (state, { payload: { data } }) => {
-      state.user = data;
-      setSessionStorage('user', data)
+      const currentsessionToken = getSessionStorage('sessionToken');
+      data.message.SessionToken = currentsessionToken;
+      state.user = data.message;
+      setSessionStorage('user', data.message)
     })
   }
 })
