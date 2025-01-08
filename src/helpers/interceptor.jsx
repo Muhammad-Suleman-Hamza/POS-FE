@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { getSessionStorage } from './storage';
 
 // Axios instance
@@ -19,7 +20,10 @@ interceptor.interceptors.request.use(
         return config;
     },
     (error) => {
-        console.error('Request error:', error);
+        const response = `Request error :: ${error}`;
+
+        toast.error(response);
+        console.error(response);
         return Promise.reject(error);
     }
 );
@@ -32,13 +36,14 @@ interceptor.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.error('Response error:', error);
+        let response = `Response error: :: ${error}`;
+        const authCheck = error.response && error.response.status === 401;
+        if(authCheck) response = 'Token expired or unauthorized, redirecting to login';
 
-        if (error.response && error.response.status === 401) {
-            console.error('Token expired or unauthorized, redirecting to login...');
-            window.location.href = '/login';
-        }
-
+        toast.error(response);
+        console.error(response);
+        if (authCheck) window.location.href = '/login';
+  
         return Promise.reject(error);
     }
 );
