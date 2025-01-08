@@ -53,11 +53,21 @@ const Login = () => {
   }
 
   const getDataOnce = async () => {
-    if (!items) await dispatch(getItems());
-    if (!orders) await dispatch(getOrders());
-    if (!vendors) await dispatch(getVendors());
-    if (!customers) await dispatch(getCustomers());
-  }
+    try {
+      const promises = [];
+
+      if (!items) promises.push(dispatch(getItems()));
+      if (!orders) promises.push(dispatch(getOrders()));
+      if (!vendors) promises.push(dispatch(getVendors()));
+      if (!customers) promises.push(dispatch(getCustomers()));
+
+      await Promise.all(promises);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      toast.error(`unable to login, err: ${err}`);
+    }
+  };
+
 
   function Copyright() {
     return (
