@@ -42,9 +42,9 @@ export const useAuth = () => {
       throw new Error('Failed to extract token details');
     }
   };
-
+  
   const decrypt = (encoded) => {
-    const salt = "I am not crazy, my mother had me tested";
+    const salt = import.meta.env.VITE_PASSWORD_SALT;
     const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
     const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
 
