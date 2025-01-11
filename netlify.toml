@@ -1,0 +1,14 @@
+[build]
+  publish = "build" # or "dist" depending on your build output folder
+  command = "npm run build" # or your build command
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Content-Type = "text/html; charset=utf-8"
