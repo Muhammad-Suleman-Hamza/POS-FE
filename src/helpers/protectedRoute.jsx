@@ -1,9 +1,9 @@
 import Loader from '../components/Loader';
 import { useAuth } from '../hooks/useAuth';
 import { Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { getSessionStorage } from './storage';
 import { useLogout } from '../hooks/useLogout';
-import React, { useEffect, useState } from 'react';
 
 const ProtectedRoute = ({ children }) => {
   const { checkSession } = useAuth();

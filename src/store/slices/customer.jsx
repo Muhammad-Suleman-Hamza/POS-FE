@@ -1,4 +1,4 @@
-import axios from 'axios';
+import interceptor from '../../helpers/interceptor';
 import { endpoints } from '../../constants/apiEndpoints';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getLocalStorage, setLocalStorage } from '../../helpers/storage';
@@ -10,7 +10,7 @@ const initialState = {
 export const getCustomer = createAsyncThunk(
   '/customer/get',
   async (pk) => {
-    const user = axios.post(`${endpoints.customer}/customer/get`, pk);
+    const user = interceptor.post(`${endpoints.customer}/customer/get`, pk);
     return user;
   }
 )
@@ -18,7 +18,7 @@ export const getCustomer = createAsyncThunk(
 export const getCustomers = createAsyncThunk(
   '/customer/all',
   async () => {
-    const user = axios.get(`${endpoints.customer}/customer/all`);
+    const user = interceptor.get(`${endpoints.customer}/customer/all`);
     return user;
   }
 )
@@ -26,7 +26,7 @@ export const getCustomers = createAsyncThunk(
 export const addCustomer = createAsyncThunk(
   '/customer/add',
   async (customer) => {
-    const user = axios.post(`${endpoints.customer}/customer/add`, customer);
+    const user = interceptor.post(`${endpoints.customer}/customer/add`, customer);
     return user;
   }
 )
@@ -34,7 +34,7 @@ export const addCustomer = createAsyncThunk(
 export const updateCustomer = createAsyncThunk(
   '/customer/update',
   async (customer) => {
-    const user = axios.post(`${endpoints.customer}/customer/update`, customer);
+    const user = interceptor.post(`${endpoints.customer}/customer/update`, customer);
     return user;
   }
 )
@@ -42,7 +42,7 @@ export const updateCustomer = createAsyncThunk(
 export const deleteCustomer = createAsyncThunk(
   '/customer/delete',
   async (pk) => {
-    const user = axios.post(`${endpoints.customer}/customer/delete`, { pk });
+    const user = interceptor.post(`${endpoints.customer}/customer/delete`, { pk });
     return user;
   }
 )

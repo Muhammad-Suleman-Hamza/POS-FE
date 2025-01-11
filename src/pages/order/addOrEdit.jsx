@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Form from "../../components/Form";
@@ -46,6 +47,9 @@ const AddOrder = () => {
     const { showCreateOrUpdateModal } = useSelector((state) => state.common);
 
     const [order, setOrder] = useState([]);
+    const [remove, setRemove] = useState(false);
+    const [update, setUpdate] = useState(false);
+    const [totalBill, setTotalBill] = useState(0);
     const [editable, setEditable] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState({
         note: [],
@@ -57,24 +61,28 @@ const AddOrder = () => {
     });
 
     const formatOrders = () => {
+        let tempTotalBill = 0;
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
         const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
+            tempTotalBill = tempTotalBill + (price[index] * quantity[index]);
+
             newOrderStructure.push({
                 customer,
-                createdDate,
                 paymentMethod,
                 id: index + 1,
                 note: note[index],
                 price: price[index],
                 quantity: quantity[index],
                 orderItem: orderItem[index],
-                totalPrice: price[index] * quantity[index]
+                totalPrice: price[index] * quantity[index],
+                createdDate: format(createdDate, "yyyy-MM-dd")
             })
             setOrder(newOrderStructure);
         }
+        setTotalBill(tempTotalBill);
         setUpdatedOrder(localOrder);
     }
 
@@ -104,19 +112,13 @@ const AddOrder = () => {
         let result = undefined;
         const { name, value } = event.target;
 
+        // if (name === 'createdDate') result = value;
         if (name === 'customer') result = customers.find((customer) => customer.pk === value)
         else if (name === 'paymentMethod') result = paymentMethods.find((paymentMethod) => paymentMethod.pk === value)
         else if (name === 'orderItem') {
             const newOrderItems = [...order];
             const newItem = { ...items.find((item) => item.pk === value) };
-            const checkItemExistInOrderOrNot = newOrderItems.find((order) => order.orderItem.pk === value);
-            
-            // if (checkItemExistInOrderOrNot) {
-            //     toast.warn('Item already exist in order');
-            //     return;
-            // }
 
-            console.log('pos :: checkItemExistInOrderOrNot :: ', checkItemExistInOrderOrNot);
             newItem['id'] = params.id;
             newOrderItems[params.id - 1]['quantity'] = 0;
             newOrderItems[params.id - 1]['orderItem'] = newItem;
@@ -156,7 +158,7 @@ const AddOrder = () => {
 
                 // item quantity check with required quantity
                 if (value > Number(localItem?.quantity)) {
-                    toast.error(`Only ${localItem?.quantity} remaining for ${localItem?.itemName}`);
+                    toast.error(`${localItem?.quantity || 0} remaining for ${localItem?.itemName}`);
                     return;
                 }
 
@@ -180,7 +182,7 @@ const AddOrder = () => {
             newOrderItemsQuantity[params.id - 1] = Number(value);
             result = newOrderItemsQuantity;
         }
-        else if (name === 'totalPrice') result = Number(value);
+        else if (name === 'totalPrice') result = value;
         else return;
 
         if (name !== 'orderItem' && result) {
@@ -200,6 +202,7 @@ const AddOrder = () => {
 
                 newOrderItemsPrice[params.id - 1] = perPiecePrice;
                 orderUpdated[params.id - 1]['price'] = perPiecePrice;
+                orderUpdated[params.id - 1]['totalPrice'] = Number(value);
 
                 setUpdatedOrder(prevValues => ({
                     ...prevValues,
@@ -210,6 +213,7 @@ const AddOrder = () => {
             setOrder(orderUpdated);
             if (name !== 'totalPrice') setUpdatedOrder(prevValues => ({ ...prevValues, [name]: result }));
         }
+        setUpdate(true);
     }
 
     const getSingleOrderColumns = () => {
@@ -230,7 +234,13 @@ const AddOrder = () => {
                             >
                                 {
                                     items?.map((item) => (
-                                        <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
+                                        <MenuItem
+                                            key={item.pk}
+                                            value={item.pk}
+                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
+                                        >
+                                            {item.itemName}
+                                        </MenuItem>
                                     ))
                                 }
                             </TextField>
@@ -303,7 +313,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 150, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             params.id === 1 && <TextField
@@ -340,11 +350,11 @@ const AddOrder = () => {
                         );
                     }
                 },
-                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
+                { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ]
             :
             [
-                { field: 'id', headerName: 'ID', width: 200, align: "center" },
+                { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
                     field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
@@ -359,7 +369,13 @@ const AddOrder = () => {
                             >
                                 {
                                     items?.map((item) => (
-                                        <MenuItem key={item.pk} value={item.pk}>{item.itemName}</MenuItem>
+                                        <MenuItem
+                                            key={item.pk}
+                                            value={item.pk}
+                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
+                                        >
+                                            {item.itemName}
+                                        </MenuItem>
                                     ))
                                 }
                             </TextField>
@@ -439,30 +455,17 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'createdDate', headerName: 'Purchase Date', width: 200, display: "flex",
+                    field: 'createdDate', headerName: 'Purchase Date', width: 150, display: "flex",
                     renderCell: (params) => {
                         return (
                             <>
-                                {
-                                    params.id === 1 ?
-                                        <TextField
-                                            fullWidth
-                                            type="date"
-                                            name="createdDate"
-                                            value={order[params.id - 1]?.createdDate}
-                                            onChange={(e) => handleChange(e, params)}
-                                        />
-                                        :
-                                        <>
-                                            {params.id === 1 && order[params.id - 1]?.createdDate}
-                                        </>
-                                }
+                                {params.id === 1 && format(order[params.id - 1]?.createdDate, "dd-MM-yyyy hh:mm:ss a")}
                             </>
                         );
                     }
                 },
                 {
-                    field: 'paymentMethod', headerName: 'Payment method', width: 200, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
+                    field: 'paymentMethod', headerName: 'Payment method', width: 150, display: "flex", valueGetter: (paymentMethod) => paymentMethod?.name,
                     renderCell: (params) => {
                         return (
                             <>
@@ -508,7 +511,8 @@ const AddOrder = () => {
                             />
                         );
                     }
-                }
+                },
+                // { field: 'remove', headerName: 'Remove', width: 100, renderCell: (params) => getRowRemoveButton(params, deleteOnClick) },
             ];
 
         return columns;
@@ -516,7 +520,6 @@ const AddOrder = () => {
 
     const handleAddOrder = async () => {
         const result = await dispatch(addOrder(updatedOrder));
-        console.log(result)
 
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
@@ -526,20 +529,20 @@ const AddOrder = () => {
             await dispatch(getItems());
             setOrder([getEmptyOrder()]);
             setUpdatedOrder({});
-            navigate("/orders");
+            navigate(`/orders/view/${result.payload.data.pk}`);
         }
     }
 
     const handleUpdateOrder = async () => {
         const result = await dispatch(updateOrder(updatedOrder));
-        console.log(result)
+        console.log(`update order :: `, result);
 
         if (!result || result?.payload === undefined) toast.error(`Unable to update order.`);
         else if (result.payload.status === 200) {
             toast.success("Order is updated.");
             await dispatch(getItems());
             setEditable(!editable);
-            navigate("/orders");
+            navigate(`/orders/view/${id}`);
         }
 
     }
@@ -575,24 +578,24 @@ const AddOrder = () => {
     const deleteOnClick = ({ id }) => {
         if (order.length === 1) {
             toast.error('At least 1 item should be in order');
+            return;
         }
-        else {
-            const filteredOrders = order?.filter((o) => o.id !== id);
-            const filteredPrices = updatedOrder?.price.filter((p, index) => index !== id - 1);
-            const filteredQuantity = updatedOrder?.quantity.filter((q, index) => index !== id - 1);
 
-            setOrder([...filteredOrders]);
-            toast.success('Item removed from order');
-            setUpdatedOrder(
-                prevValues => ({
-                    ...prevValues,
-                    price: filteredPrices,
-                    orderItem: filteredOrders,
-                    quantity: filteredQuantity
-                })
-            );
-        }
-    }
+        const filteredPlaneOrders = order?.filter((o) => o.id !== id);
+        const filteredUpdatedOrderItem = updatedOrder?.orderItem.filter((o) => o.id !== id);
+        const filteredPrices = updatedOrder?.price.filter((_, index) => index !== id - 1);
+        const filteredQuantity = updatedOrder?.quantity.filter((_, index) => index !== id - 1);
+
+        setRemove(true);
+        setOrder(filteredPlaneOrders);
+        toast.success('Item removed from order');
+        setUpdatedOrder((prevValues) => ({
+            ...prevValues,
+            price: filteredPrices,
+            quantity: filteredQuantity,
+            orderItem: filteredUpdatedOrderItem,
+        }));
+    };
 
     console.log('pos :: order :: ', order);
     console.log('pos :: updatedOrder :: ', updatedOrder);
@@ -612,10 +615,34 @@ const AddOrder = () => {
         else if (!id && source === 'add' && !order?.length) addNewItemInOrder();
     }, []);
 
+    useEffect(() => {
+        if (remove) {
+            setRemove(false);
+            const filteredOrders = order.map((o, index) => ({ ...o, id: index + 1 }));
+            const filteredUpdatedOrder = updatedOrder?.orderItem.map((o, index) => ({ ...o, id: index + 1 }));
+
+            setOrder([...filteredOrders]);
+            setUpdatedOrder(
+                prevValues => ({
+                    ...prevValues,
+                    orderItem: filteredUpdatedOrder,
+                })
+            );
+        }
+    }, [remove])
+
+    useEffect(() => {
+        if (update) {
+            setUpdate(false);
+            const tempTotalBill = order.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+            setTotalBill(tempTotalBill);
+        }
+    }, [update])
+
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={title} subtitle="" />
+                <Header title={title} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
                 <Box>
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>

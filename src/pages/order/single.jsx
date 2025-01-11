@@ -1,29 +1,36 @@
+import { format } from 'date-fns';
 import { tokens } from "../../theme";
 import Button from '@mui/material/Button';
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { Box, useTheme } from "@mui/material";
+import { useReactToPrint } from 'react-to-print';
 import { Link, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { backButton, editButton } from '../../constants/FormFields'
 
 const ViewOrder = () => {
     const theme = useTheme();
     const { id } = useParams();
+    const printComponentRef = useRef();
     const colors = tokens(theme.palette.mode);
 
     const [order, setOrder] = useState([]);
+    const [totalBill, setTotalBill] = useState(0);
+    // const [printing, setPrinting] = useState(false);
     const [currentOrder, setCurrentOrder] = useState({});
 
     const { orders } = useSelector((state) => state.order);
 
     const formatOrders = () => {
+        let tempTotalBill = 0;
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
         const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
+            tempTotalBill = tempTotalBill + (price[index] * quantity[index]);
             newOrderStructure.push({
                 customer,
                 createdDate,
@@ -39,6 +46,7 @@ const ViewOrder = () => {
             setOrder(newOrderStructure);
         }
 
+        setTotalBill(tempTotalBill);
         setCurrentOrder(localOrder);
     }
 
@@ -104,7 +112,7 @@ const ViewOrder = () => {
                     return (
 
                         <>
-                            {params.id === 1 && order[params.id - 1]?.createdDate}
+                            {params.id === 1 && format(order[params.id - 1]?.createdDate, "dd-MM-yyyy hh:mm:ss a")}
                         </>
                     );
                 }
@@ -134,22 +142,47 @@ const ViewOrder = () => {
         return columns;
     }
 
+    // const handleBeforePrint = useCallback(() => {
+    //     setPrinting(!printing);
+    // }, [setPrinting]);
+
+    // const handleAfterPrint = () => {
+    //     setPrinting(!printing);
+    // }
+
+    const handlePrintError = ((errorLocation, error) => {
+        console.error(`An error occurred in errorLocation:  ${errorLocation}: ${error}`);
+        // setPrinting(!printing);
+    });
+
+    const handleReactToPrintFn = useReactToPrint({
+        documentTitle: `Order ${id}`,
+        contentRef: printComponentRef,
+        // onAfterPrint: handleAfterPrint,
+        onPrintError: handlePrintError,
+        // onBeforePrint: handleBeforePrint,
+    });
+
     useEffect(() => {
         if (id && !order.length) formatOrders()
     }, []);
 
+    // console.log('pos :: printing :: ', printing);
+
     return (
-        <Box m="20px">
+        <Box m="20px" ref={printComponentRef}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={`Order: ${id}`} subtitle="" />
-                <Box>
+                <Header title={`Order: ${id}`} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
+                <Box className="hide-on-print">
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton}><Link to={`/orders/update/${currentOrder?.pk}`} style={{ ...backButton.anchorsx }}>Edit</Link></Button>
+                    <Button {...editButton} onClick={handleReactToPrintFn}>Print</Button>
                 </Box>
             </Box>
             <Box
                 m="8px 0 0 0"
                 height="80vh"
+                className="print-text print-background"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -180,11 +213,13 @@ const ViewOrder = () => {
                     order.length &&
                     <DataGrid
                         rows={order}
+                        // className="print-text"
                         // unstable_rowSpanning
                         showCellVerticalBorder
                         showColumnVerticalBorder
                         getRowId={(row) => row.id}
                         columns={getSingleOrderColumns()}
+                        className="print-text print-background"
                     />
                 }
             </Box>
