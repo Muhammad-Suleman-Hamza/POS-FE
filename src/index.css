@@ -47,12 +47,6 @@ body,
     background-color: white !important;
   }
 
-  .print-text,
-  .page-title,
-  .page-sub-title {
-    color: black !important;
-  }
-
   .MuiDataGrid-columnHeader {
     border-bottom: 1px solid black !important;
   }
@@ -62,8 +56,15 @@ body,
     border-right-color: black !important;
   }
 
+  .print-text,
+  .page-title,
+  .page-sub-title {
+    color: black !important;
+  }
+
   .hide-on-print,
-  .css-15lx25q-MuiDataGrid-footerContainer {
+  .MuiDataGrid-scrollbar,
+  .MuiDataGrid-footerContainer {
     display: none !important;
   }
 
@@ -71,6 +72,6 @@ body,
   .MuiDataGrid-topContainer,
   .MuiDataGrid-virtualScroller {
     background-color: white !important;
-    --DataGrid-containerBackground: white !important
+    --DataGrid-containerBackground: white !important;
   }
 }
