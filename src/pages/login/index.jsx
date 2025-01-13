@@ -41,8 +41,14 @@ const Login = () => {
   }
 
   const submitHandler = async (e) => {
-    await dispatch(toggleLoading());
     e.preventDefault();
+    
+    if (userDetails?.email === '' || userDetails?.password === '') {
+      toast.error('Please add email and password');
+      return;
+    }
+
+    await dispatch(toggleLoading());
     const result = await dispatch(login(userDetails))
     if (result?.payload?.status === 200) {
       await getDataOnce()
