@@ -1,6 +1,7 @@
 "use client";
 import Item from "./pages/item";
 import Login from "./pages/login";
+import LogRocket from 'logrocket';
 import Order from "./pages/order";
 import Vendor from "./pages/vendor";
 import Reports from "./pages/reports";
@@ -22,6 +23,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MyProSidebarProvider } from "./pages/global/sidebar/sidebarContext";
 
 const App = () => {
+  LogRocket.init('xwbnvm/pos');
+
   const [theme, colorMode] = useMode();
 
   const logError = (error, info) => {
