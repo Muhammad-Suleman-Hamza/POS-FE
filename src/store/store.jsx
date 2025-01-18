@@ -1,3 +1,4 @@
+import LogRocket from 'logrocket'
 import itemReducer from './slices/item'
 import orderReducer from './slices/order'
 import loginReducer from './slices/auth'
@@ -15,4 +16,6 @@ export const store = configureStore({
     vendor: vendorReducer,
     customer: customerReducer,
   },
-})
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(LogRocket.reduxMiddleware()),
+});

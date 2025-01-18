@@ -1,5 +1,6 @@
 import './login.css';
 import { useState } from "react";
+import LogRocket from 'logrocket';
 import { tokens } from "../../theme";
 import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid2';
@@ -41,12 +42,26 @@ const Login = () => {
   }
 
   const submitHandler = async (e) => {
-    await dispatch(toggleLoading());
     e.preventDefault();
+
+    if (userDetails?.email === '' || userDetails?.password === '') {
+      toast.error('Please add email and password');
+      return;
+    }
+
+    await dispatch(toggleLoading());
     const result = await dispatch(login(userDetails))
     if (result?.payload?.status === 200) {
-      await getDataOnce()
+      const { email, userName } = result?.payload?.data?.message;
+
+      await getDataOnce();
       toast.success('Logged in succesfully');
+
+      LogRocket.identify('Logged in', {
+        email,
+        name: userName,
+      });
+
       navigate('/');
     } else toast.error(result?.payload?.message);
     await dispatch(toggleLoading());
