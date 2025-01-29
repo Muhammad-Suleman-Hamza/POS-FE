@@ -76,7 +76,7 @@ const Order = () => {
       >
         <DataGrid
           rows={orders}
-          unstable_rowSpanning
+          // unstable_rowSpanning
           columns={orderColumns}
           showCellVerticalBorder
           showColumnVerticalBorder
