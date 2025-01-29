@@ -84,7 +84,7 @@ const SingleCustomer = () => {
       >
         <DataGrid
           rows={customer}
-          unstable_rowSpanning
+          // unstable_rowSpanning
           showCellVerticalBorder
           showColumnVerticalBorder
           columns={customerColumns}

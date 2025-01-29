@@ -89,7 +89,7 @@ const Item = () => {
       >
         <DataGrid
           rows={items}
-          unstable_rowSpanning
+          // unstable_rowSpanning
           columns={itemColumns}
           showCellVerticalBorder
           showColumnVerticalBorder
