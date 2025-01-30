@@ -8,7 +8,7 @@ const Header = ({ title, subtitle, parentClass, titleClass = '', subTitleClass =
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box mb="30px" className={parentClass}>
+    <Box className={parentClass}>
       <Typography
         variant="h2"
         fontWeight="bold"

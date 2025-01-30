@@ -41,7 +41,7 @@ const Order = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" alignItems="center" gap={10}>
         <Header title="Orders" subtitle="" />
         <Button {...addButton}><Link to={'add'} style={{ ...addButton.anchorsx }}>Add Order</Link></Button>
       </Box>

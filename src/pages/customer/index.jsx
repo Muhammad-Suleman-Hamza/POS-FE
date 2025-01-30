@@ -54,7 +54,7 @@ const Customer = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" alignItems="center" gap={10}>
         <Header title="Customers" subtitle="" />
         <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Customer</Button>
       </Box>
