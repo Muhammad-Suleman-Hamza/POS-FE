@@ -11,8 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { addOrder, updateOrder } from "../../store/slices/order";
-import { Box, MenuItem, TextField, useTheme } from "@mui/material";
 import { toggleCreateOrUpdateModal } from "../../store/slices/common";
+import {
+    Box,
+    useTheme,
+    MenuItem,
+    TextField,
+    Autocomplete
+} from "@mui/material";
 import {
     getLocalStorage,
     setSessionStorage,
@@ -221,6 +227,29 @@ const AddOrder = () => {
             [
                 { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
+                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
+                    renderCell: (params) => {
+                        return (
+                            params.id === 1 &&
+                            <TextField
+                                select
+                                fullWidth
+                                type="string"
+                                name="customer"
+                                onChange={(e) => handleChange(e, params)}
+                                value={order[params.id - 1]?.customer?.pk}
+                            >
+                                <MenuItem key={'new'} value={'new'} onClick={handleNewCustomer}>Add Customer</MenuItem>
+                                {
+                                    customers?.map((customer) => (
+                                        <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
+                                    ))
+                                }
+                            </TextField>
+                        );
+                    }
+                },
+                {
                     field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
@@ -248,21 +277,24 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'price', headerName: 'Single price', width: 200, display: "flex",
+                    field: 'price', headerName: 'Single price', width: 150, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
                                 fullWidth
-                                type="number"
                                 name="price"
+                                type="number"
                                 value={order[params.id - 1]?.price}
-                                onChange={(e) => handleChange(e, params)}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
                             />
                         );
                     }
                 },
                 {
-                    field: 'quantity', headerName: 'Quantity', width: 200, display: "flex",
+                    field: 'quantity', headerName: 'Quantity', width: 150, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -270,13 +302,16 @@ const AddOrder = () => {
                                 type="number"
                                 name="quantity"
                                 value={order[params.id - 1]?.quantity}
-                                onChange={(e) => handleChange(e, params)}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
                             />
                         );
                     }
                 },
                 {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200, display: "flex",
+                    field: 'totalPrice', headerName: 'Total Price', width: 150, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -284,31 +319,11 @@ const AddOrder = () => {
                                 type="number"
                                 name="totalPrice"
                                 value={order[params.id - 1]?.totalPrice}
-                                onChange={(e) => handleChange(e, params)}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
                             />
-                        );
-                    }
-                },
-                {
-                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
-                    renderCell: (params) => {
-                        return (
-                            params.id === 1 &&
-                            <TextField
-                                select
-                                fullWidth
-                                type="string"
-                                name="customer"
-                                onChange={(e) => handleChange(e, params)}
-                                value={order[params.id - 1]?.customer?.pk}
-                            >
-                                <MenuItem key={'new'} value={'new'} onClick={handleNewCustomer}>Add Customer</MenuItem>
-                                {
-                                    customers?.map((customer) => (
-                                        <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
-                                    ))
-                                }
-                            </TextField>
                         );
                     }
                 },
@@ -356,75 +371,6 @@ const AddOrder = () => {
             [
                 { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
-                    renderCell: (params) => {
-                        return (
-                            <TextField
-                                select
-                                fullWidth
-                                type="string"
-                                name="orderItem"
-                                onChange={(e) => handleChange(e, params)}
-                                value={order[params.id - 1]?.orderItem?.pk}
-                            >
-                                {
-                                    items?.map((item) => (
-                                        <MenuItem
-                                            key={item.pk}
-                                            value={item.pk}
-                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
-                                        >
-                                            {item.itemName}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </TextField>
-                        );
-                    }
-                },
-                {
-                    field: 'price', headerName: 'Single price', width: 200, display: "flex",
-                    renderCell: (params) => {
-                        return (
-                            <TextField
-                                fullWidth
-                                name="price"
-                                type="number"
-                                value={order[params.id - 1]?.price}
-                                onChange={(e) => handleChange(e, params)}
-                            />
-                        );
-                    }
-                },
-                {
-                    field: 'quantity', headerName: 'Quantity', width: 200, display: "flex",
-                    renderCell: (params) => {
-                        return (
-                            <TextField
-                                fullWidth
-                                type="number"
-                                name="quantity"
-                                value={order[params.id - 1]?.quantity}
-                                onChange={(e) => handleChange(e, params)}
-                            />
-                        );
-                    }
-                },
-                {
-                    field: 'totalPrice', headerName: 'Total Price', width: 200, display: "flex",
-                    renderCell: (params) => {
-                        return (
-                            <TextField
-                                fullWidth
-                                type="number"
-                                name="totalPrice"
-                                value={order[params.id - 1]?.totalPrice}
-                                onChange={(e) => handleChange(e, params)}
-                            />
-                        );
-                    }
-                },
-                {
                     field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
@@ -454,6 +400,85 @@ const AddOrder = () => {
                         );
                     }
                 },
+                {
+                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                select
+                                fullWidth
+                                type="string"
+                                name="orderItem"
+                                onChange={(e) => handleChange(e, params)}
+                                value={order[params.id - 1]?.orderItem?.pk}
+                            >
+                                {
+                                    items?.map((item) => (
+                                        <MenuItem
+                                            key={item.pk}
+                                            value={item.pk}
+                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
+                                        >
+                                            {item.itemName}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </TextField>
+                        );
+                    }
+                },
+                {
+                    field: 'price', headerName: 'Single price', width: 150, display: "flex",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                fullWidth
+                                name="price"
+                                type="number"
+                                value={order[params.id - 1]?.price}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
+                            />
+                        );
+                    }
+                },
+                {
+                    field: 'quantity', headerName: 'Quantity', width: 150, display: "flex",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                fullWidth
+                                type="number"
+                                name="quantity"
+                                value={order[params.id - 1]?.quantity}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
+                            />
+                        );
+                    }
+                },
+                {
+                    field: 'totalPrice', headerName: 'Total Price', width: 150, display: "flex",
+                    renderCell: (params) => {
+                        return (
+                            <TextField
+                                fullWidth
+                                type="number"
+                                name="totalPrice"
+                                value={order[params.id - 1]?.totalPrice}
+                                onChange={(e) => {
+                                    const valueCheck = parseFloat(e.target.value);
+                                    if (valueCheck > 0) handleChange(e, params);
+                                }}
+                            />
+                        );
+                    }
+                },
+
                 {
                     field: 'createdDate', headerName: 'Purchase Date', width: 150, display: "flex",
                     renderCell: (params) => {
@@ -641,13 +666,18 @@ const AddOrder = () => {
 
     return (
         <Box m="20px">
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={title} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
+            <Box m="10px">
+                <Header title={title} />
+            </Box>
+            <Box m="10px" ml="-10px">
                 <Box>
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>
                     <Button {...editButton} onClick={source === 'add' ? handleAddOrder : handleUpdateOrder}>Save</Button>
                 </Box>
+            </Box>
+            <Box m="10px" textAlign="center">
+                <Header title={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
             </Box>
             <Box
                 m="8px 0 0 0"
@@ -678,20 +708,15 @@ const AddOrder = () => {
                     },
                 }}
             >
-                {
-                    order?.length &&
-                    customers?.length &&
-                    paymentMethods?.length &&
-                    <DataGrid
-                        rows={order}
-                        rowHeight={80}
-                        // unstable_rowSpanning
-                        showCellVerticalBorder
-                        showColumnVerticalBorder
-                        getRowId={(row) => row.id}
-                        columns={getSingleOrderColumns()}
-                    />
-                }
+                <DataGrid
+                    rows={order}
+                    rowHeight={80}
+                    // unstable_rowSpanning
+                    showCellVerticalBorder
+                    showColumnVerticalBorder
+                    getRowId={(row) => row.id}
+                    columns={getSingleOrderColumns()}
+                />
             </Box>
 
             {/* customer modal */}

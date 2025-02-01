@@ -72,10 +72,11 @@ const MyProSidebar = () => {
       }}
     >
       <Sidebar
+        width="200px"
         breakPoint="md"
         rtl={sidebarRTL}
-        backgroundColor={colors.primary[400]}
         image={sidebarImage}
+        backgroundColor={colors.primary[400]}
       >
         <Menu iconshape="square">
           <MenuItem
@@ -104,8 +105,8 @@ const MyProSidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  Dashboard
+                <Typography variant="h5" color={colors.grey[100]}>
+                  POS
                 </Typography>
                 <IconButton
                   onClick={

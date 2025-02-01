@@ -39,7 +39,6 @@ const Customer = () => {
     (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
 
-
   const deleteCB = async () => {
     await dispatch(toggleLoading()); 
     const result = await dispatch(deleteCustomer(entryToBeUpdateOrDelete.pk));
@@ -54,8 +53,10 @@ const Customer = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" alignItems="center" gap={10}>
+      <Box m="10px">
         <Header title="Customers" subtitle="" />
+      </Box>
+      <Box m="10px">
         <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Customer</Button>
       </Box>
       <Box
