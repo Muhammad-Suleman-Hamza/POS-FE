@@ -10,11 +10,11 @@ import BasicModal from '../../components/Modal';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteItem, getItems } from "../../store/slices/item";
 import { DeleteConfirmation } from "../../components/DeleteConfirmation";
-import { 
+import {
   toggleLoading,
-  saveEntryToBeUpdated, 
-  toggleCreateOrUpdateModal, 
-  toggleDeleteConfirmationModal 
+  saveEntryToBeUpdated,
+  toggleCreateOrUpdateModal,
+  toggleDeleteConfirmationModal
 } from "../../store/slices/common";
 import {
   addButton,
@@ -54,8 +54,10 @@ const Item = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" alignItems="center" gap={10}>
+      <Box m="10px">
         <Header title="Items" subtitle="" />
+      </Box>
+      <Box m="10px">
         <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Item</Button>
       </Box>
       <Box

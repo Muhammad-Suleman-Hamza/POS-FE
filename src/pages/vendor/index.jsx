@@ -54,8 +54,10 @@ const Vendor = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" alignItems="center" gap={10}>
+      <Box m="10px">
         <Header title="Vendors" subtitle="" />
+      </Box>
+      <Box m="10px">
         <Button {...addButton} onClick={() => dispatch(toggleCreateOrUpdateModal({ action: 'create', value: true }))}>Add Vendor</Button>
       </Box>
       <Box

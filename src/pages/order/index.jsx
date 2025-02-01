@@ -41,8 +41,10 @@ const Order = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" alignItems="center" gap={10}>
+      <Box m="10px">
         <Header title="Orders" subtitle="" />
+      </Box>
+      <Box m="10px">
         <Button {...addButton}><Link to={'add'} style={{ ...addButton.anchorsx }}>Add Order</Link></Button>
       </Box>
       <Box

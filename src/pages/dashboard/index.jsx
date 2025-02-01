@@ -1,10 +1,11 @@
+import { format } from "date-fns";
 import { tokens } from "../../theme";
 import Grid from '@mui/material/Grid2';
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { viewButton } from "../../constants/FormFields";
 import { Box, useTheme, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -69,31 +70,33 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.greenAccent[500]}
               >
-                Today Order's
+                Today Orders ({format(new Date(), "dd-MM-yyyy")})
               </Typography>
             </Box>
             {
-              todayOrders?.length &&
-              <Box
-                p="15px"
-                display="flex"
-                alignItems="center"
-                color={colors.grey[100]}
-                justifyContent="space-between"
-                borderBottom={`4px solid ${colors.greenAccent[500]}`}
-              >
-                {columns.map((col, index) => (
-                  <Typography
-                    key={index}
-                    variant="h4"
-                    fontWeight="600"
-                    width={col.width}
-                    color={colors.blueAccent[300]}
-                  >
-                    {col.label}
-                  </Typography>
-                ))}
-              </Box>
+              todayOrders?.length ?
+                <Box
+                  p="15px"
+                  display="flex"
+                  alignItems="center"
+                  color={colors.grey[100]}
+                  justifyContent="space-between"
+                  borderBottom={`4px solid ${colors.greenAccent[500]}`}
+                >
+                  {columns.map((col, index) => (
+                    <Typography
+                      key={index}
+                      variant="h4"
+                      fontWeight="600"
+                      width={col.width}
+                      color={colors.blueAccent[300]}
+                    >
+                      {col.label}
+                    </Typography>
+                  ))}
+                </Box>
+                :
+                <></>
             }
             {
               todayOrders?.length ?
