@@ -39,7 +39,6 @@ const Customer = () => {
     (params) => dispatch(toggleDeleteConfirmationModal(params.row))
   );
 
-
   const deleteCB = async () => {
     await dispatch(toggleLoading()); 
     const result = await dispatch(deleteCustomer(entryToBeUpdateOrDelete.pk));
