@@ -51,7 +51,7 @@ const SingleCustomer = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={`Customers: ${id}`} subtitle="" />
-        <Button {...backButton}><Link to={'/items'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
+        <Button {...backButton}><Link to={'/customers'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -91,21 +91,6 @@ const SingleCustomer = () => {
           disableRowSelectionOnClick
           getRowId={(row) => row.pk}
         />
-
-        <BasicModal
-          handleClose={() => dispatch(toggleCreateOrUpdateModal())}
-          open={showCreateOrUpdateModal.create || showCreateOrUpdateModal.update}
-        >
-          <Form
-            subtitle=""
-            source='customer'
-            inputsFields={customerFormColumns}
-            checkoutSchema={checkoutSchemaOfCustomer}
-            button={showCreateOrUpdateModal.create ? addButton : editButton}
-            title={showCreateOrUpdateModal.create ? "Create Customer" : "Update Customer"}
-            initialValues={showCreateOrUpdateModal.create ? initialValuesOfCustomer : entryToBeUpdateOrDelete}
-          />
-        </BasicModal>
       </Box>
     </Box>
   );

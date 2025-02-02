@@ -65,7 +65,7 @@ export const orderSlice = createSlice({
         setLocalStorage('orders', data);
       })
       .addCase(addOrder.fulfilled, (state, { payload: { data } }) => {
-        const updated = [...state?.orders, data];
+        const updated = [data, ...state?.orders];
 
         state.orders = updated;
         setLocalStorage('orders', updated);
