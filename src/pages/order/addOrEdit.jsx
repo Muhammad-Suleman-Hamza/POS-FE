@@ -695,6 +695,7 @@ const AddOrder = () => {
             pk: generatePK(),
             customerPK: customer?.pk,
             paymentMethod: paymentMethod.name,
+            createdDate: new Date().toUTCString()
         })
 
         customer['ledger'] = customerLedger;

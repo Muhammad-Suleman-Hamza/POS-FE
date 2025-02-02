@@ -10,40 +10,40 @@ const initialState = {
 export const getOrder = createAsyncThunk(
   '/order/get',
   async (pk) => {
-    const user = interceptor.post(`${endpoints.order}/order/get`, pk);
-    return user;
+    const o = interceptor.post(`${endpoints.order}/order/get`, pk);
+    return o;
   }
 )
 
 export const getOrders = createAsyncThunk(
   '/order/all',
   async () => {
-    const user = interceptor.get(`${endpoints.order}/order/all`);
-    return user;
+    const o = interceptor.get(`${endpoints.order}/order/all`);
+    return o;
   }
 )
 
 export const addOrder = createAsyncThunk(
   '/order/add',
   async (order) => {
-    const user = interceptor.post(`${endpoints.order}/order/add`, order);
-    return user;
+    const o = interceptor.post(`${endpoints.order}/order/add`, order);
+    return o;
   }
 )
 
 export const updateOrder = createAsyncThunk(
   '/order/update',
   async (order) => {
-    const user = interceptor.post(`${endpoints.order}/order/update`, order);
-    return user;
+    const o = interceptor.post(`${endpoints.order}/order/update`, order);
+    return o;
   }
 )
 
 export const deleteOrder = createAsyncThunk(
   '/order/delete',
   async (pk) => {
-    const user = interceptor.post(`${endpoints.order}/order/delete`, { pk });
-    return user;
+    const o = interceptor.post(`${endpoints.order}/order/delete`, { pk });
+    return o;
   }
 )
 
