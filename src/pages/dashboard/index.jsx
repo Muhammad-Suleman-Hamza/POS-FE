@@ -37,7 +37,7 @@ const Dashboard = () => {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
 
-    const todayOrders = orders.filter(order => {
+    const todayOrders = orders?.filter(order => {
       const orderDate = new Date(order.createdDate).toISOString().split('T')[0];
       return orderDate === todayStr;
     });
