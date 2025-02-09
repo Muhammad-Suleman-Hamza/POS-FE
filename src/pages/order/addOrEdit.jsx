@@ -11,7 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { addOrder, updateOrder } from "../../store/slices/order";
-import { toggleCreateOrUpdateModal } from "../../store/slices/common";
+import { toggleCreateOrUpdateModal, toggleLoading } from "../../store/slices/common";
+import {
+    Box,
+    useTheme,
+    MenuItem,
+    TextField,
+    Autocomplete
+} from "@mui/material";
 import {
     Box,
     useTheme,
@@ -30,11 +37,10 @@ import {
     backButton,
     editButton,
     getEmptyOrder,
+    getRowRemoveButton,
     customerFormColumns,
     initialValuesOfCustomer,
     checkoutSchemaOfCustomer,
-    getRowButtons,
-    getRowRemoveButton
 } from '../../constants/FormFields'
 import { getItems } from "../../store/slices/item";
 
@@ -63,6 +69,8 @@ const AddOrder = () => {
         customer: {},
         quantity: [],
         orderItem: [],
+        pendingAmount: 0,
+        receivedAmount: 0,
         paymentMethod: {}
     });
 
@@ -70,7 +78,7 @@ const AddOrder = () => {
         let tempTotalBill = 0;
         const newOrderStructure = [];
         const localOrder = orders.find((order) => order.pk === id);
-        const { note, price, quantity, customer, orderItem, createdDate, paymentMethod } = localOrder;
+        const { note, price, quantity, customer, orderItem, createdDate, paymentMethod, pendingAmount, receivedAmount } = localOrder;
 
         for (let index = 0; index < orderItem.length; index++) {
             tempTotalBill = tempTotalBill + (price[index] * quantity[index]);
@@ -227,52 +235,52 @@ const AddOrder = () => {
             [
                 { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 250, display: "flex", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
                             params.id === 1 &&
-                            <TextField
-                                select
+                            <Autocomplete
                                 fullWidth
-                                type="string"
-                                name="customer"
-                                onChange={(e) => handleChange(e, params)}
-                                value={order[params.id - 1]?.customer?.pk}
-                            >
-                                <MenuItem key={'new'} value={'new'} onClick={handleNewCustomer}>Add Customer</MenuItem>
-                                {
-                                    customers?.map((customer) => (
-                                        <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
-                                    ))
-                                }
-                            </TextField>
+                                getOptionLabel={(option) => option.customerName || ""}
+                                isOptionEqualToValue={(option, value) => option.pk === value.pk}
+                                options={[{ pk: "new", customerName: "➕ Add Customer" }, ...customers]}
+                                value={customers.find(customer => customer.pk === order[params.id - 1]?.customer?.pk) || null}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Select Customer" variant="outlined" />
+                                )}
+                                onChange={(event, newValue) => {
+                                    if (newValue?.pk === "new") {
+                                        handleNewCustomer();
+                                    } else {
+                                        handleChange({ target: { name: "customer", value: newValue?.pk } }, params);
+                                    }
+                                }}
+                            />
                         );
                     }
                 },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 300, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
-                            <TextField
-                                select
+                            <Autocomplete
                                 fullWidth
-                                type="string"
-                                name="orderItem"
-                                onChange={(e) => handleChange(e, params)}
-                                value={order[params.id - 1]?.orderItem?.pk}
-                            >
-                                {
-                                    items?.map((item) => (
-                                        <MenuItem
-                                            key={item.pk}
-                                            value={item.pk}
-                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
-                                        >
-                                            {item.itemName}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </TextField>
+                                options={items}
+                                getOptionLabel={(option) => option.itemName}
+                                isOptionEqualToValue={(option, value) => option.pk === value.pk}
+                                value={items.find(item => item.pk === order[params.id - 1]?.orderItem?.pk) || null}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Select Item" variant="outlined" />
+                                )}
+                                onChange={(event, newValue) => {
+                                    handleChange({ target: { name: "orderItem", value: newValue?.pk } }, params);
+                                }}
+                                renderOption={(props, option) => (
+                                    <MenuItem {...props} key={option.pk} value={option.pk} disabled={order.some(o => o.orderItem?.pk === option.pk)}>
+                                        {option.itemName}
+                                    </MenuItem>
+                                )}
+                            />
                         );
                     }
                 },
@@ -349,7 +357,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'note', headerName: 'Note', width: 400, display: "flex",
+                    field: 'note', headerName: 'Note', width: 300, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -371,26 +379,25 @@ const AddOrder = () => {
             [
                 { field: 'id', headerName: 'ID', width: 50, align: "center" },
                 {
-                    field: 'customer', headerName: 'Customer', width: 200, display: "flex", valueGetter: (customer) => customer?.customerName,
+                    field: 'customer', headerName: 'Customer', width: 250, display: "flex", valueGetter: (customer) => customer?.customerName,
                     renderCell: (params) => {
                         return (
                             <>
                                 {
                                     params.id === 1 ?
-                                        <TextField
-                                            select
+                                        <Autocomplete
                                             fullWidth
-                                            type="string"
-                                            name="customer"
-                                            onChange={(e) => handleChange(e, params)}
-                                            value={order[params.id - 1]?.customer?.pk}
-                                        >
-                                            {
-                                                customers?.map((customer) => (
-                                                    <MenuItem key={customer.pk} value={customer.pk}>{customer.customerName}</MenuItem>
-                                                ))
-                                            }
-                                        </TextField>
+                                            options={customers}
+                                            getOptionLabel={(option) => option.customerName || ""}
+                                            isOptionEqualToValue={(option, value) => option.pk === value.pk}
+                                            value={customers.find(customer => customer.pk === order[params.id - 1]?.customer?.pk) || null}
+                                            renderInput={(params) => (
+                                                <TextField {...params} label="Select Customer" variant="outlined" />
+                                            )}
+                                            onChange={(event, newValue) => {
+                                                handleChange({ target: { name: "customer", value: newValue?.pk } }, params);
+                                            }}
+                                        />
                                         :
                                         <>
                                             {params.id === 1 && order[params.id - 1]?.customer?.customerName}
@@ -401,29 +408,23 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'orderItem', headerName: 'Item', width: 200, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
+                    field: 'orderItem', headerName: 'Item', width: 300, display: "flex", valueGetter: (orderItem) => orderItem?.itemName,
                     renderCell: (params) => {
                         return (
-                            <TextField
-                                select
+                            <Autocomplete
                                 fullWidth
-                                type="string"
-                                name="orderItem"
-                                onChange={(e) => handleChange(e, params)}
-                                value={order[params.id - 1]?.orderItem?.pk}
-                            >
-                                {
-                                    items?.map((item) => (
-                                        <MenuItem
-                                            key={item.pk}
-                                            value={item.pk}
-                                            disabled={order.findIndex((o) => o.orderItem?.pk === item.pk) !== -1}
-                                        >
-                                            {item.itemName}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </TextField>
+                                options={items}
+                                getOptionLabel={(option) => option.itemName || ""}
+                                isOptionEqualToValue={(option, value) => option.pk === value.pk}
+                                getOptionDisabled={(option) => order.some(o => o.orderItem?.pk === option.pk)}
+                                value={items.find(item => item.pk === order[params.id - 1]?.orderItem?.pk) || null}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Select Item" variant="outlined" />
+                                )}
+                                onChange={(event, newValue) => {
+                                    handleChange({ target: { name: "orderItem", value: newValue?.pk } }, params);
+                                }}
+                            />
                         );
                     }
                 },
@@ -478,7 +479,6 @@ const AddOrder = () => {
                         );
                     }
                 },
-
                 {
                     field: 'createdDate', headerName: 'Purchase Date', width: 150, display: "flex",
                     renderCell: (params) => {
@@ -520,7 +520,7 @@ const AddOrder = () => {
                     }
                 },
                 {
-                    field: 'note', headerName: 'Note', width: 400, display: "flex",
+                    field: 'note', headerName: 'Note', width: 300, display: "flex",
                     renderCell: (params) => {
                         return (
                             <TextField
@@ -532,7 +532,7 @@ const AddOrder = () => {
                                 type="string"
                                 value={order[params.id - 1]?.note}
                                 onChange={(e) => handleChange(e, params)}
-                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()}
+                                onKeyDown={(e) => e.key === ' ' && e.code === 'Space' && e.stopPropagation()} // handle mui space bar issue
                             />
                         );
                     }
@@ -544,7 +544,29 @@ const AddOrder = () => {
     }
 
     const handleAddOrder = async () => {
+        if (updatedOrder?.receivedAmount === 0) {
+            toast.error('Please add received amount.');
+            return;
+        }
+        else if (Object.keys(updatedOrder.customer).length === 0) {
+            toast.error('Please add customer.');
+            return;
+        }
+        else if (Object.keys(updatedOrder?.paymentMethod).length === 0) {
+            toast.error('Please add payment method.');
+            return;
+        }
+        else if (updatedOrder?.price?.length !== updatedOrder?.quantity?.length) {
+            toast.error('Please add price and quantity for each item.');
+            return;
+        }
+
+
+        await dispatch(toggleLoading());
+        await formatCustomerLedger();
+      
         const result = await dispatch(addOrder(updatedOrder));
+        console.log(`add order :: `, result);
 
         if (!result || result?.payload === undefined) toast.error(`Unable to add order.`);
         else if (result.payload.status === 200) {
@@ -553,12 +575,31 @@ const AddOrder = () => {
             toast.success("Order is added.");
             await dispatch(getItems());
             setOrder([getEmptyOrder()]);
+            dispatch(toggleLoading());
             setUpdatedOrder({});
             navigate(`/orders/view/${result.payload.data.pk}`);
         }
     }
 
     const handleUpdateOrder = async () => {
+        if (updatedOrder?.receivedAmount?.length === 0) {
+            toast.error('Please add received amount.');
+            return;
+        }
+        else if (Object.values(updatedOrder?.customer)?.length === 0) {
+            toast.error('Please add customer.');
+            return;
+        }
+        else if (Object.values(updatedOrder?.paymentMethod)?.length === 0) {
+            toast.error('Please add payment method.');
+            return;
+        }
+        else if (updatedOrder?.price?.length !== updatedOrder?.quantity?.length) {
+            toast.error('Please add price and quantity for each item.');
+            return;
+        }
+
+        await dispatch(toggleLoading());
         const result = await dispatch(updateOrder(updatedOrder));
         console.log(`update order :: `, result);
 
@@ -566,6 +607,7 @@ const AddOrder = () => {
         else if (result.payload.status === 200) {
             toast.success("Order is updated.");
             await dispatch(getItems());
+            dispatch(toggleLoading());
             setEditable(!editable);
             navigate(`/orders/view/${id}`);
         }
@@ -622,6 +664,55 @@ const AddOrder = () => {
         }));
     };
 
+    const generatePK = () => {
+        let randomNumber = '';
+        for (let i = 0; i < 12; i++) {
+            randomNumber += Math.floor(Math.random() * 10).toString();
+        }
+        return randomNumber;
+    }
+
+    const handleAmounts = (event) => {
+        const { value } = event.target;
+        const { price, quantity } = updatedOrder;
+
+        const ta = price?.reduce((prevAmount, p, i) => prevAmount + (p * quantity[i]), 0);
+        const ra = Number(value);
+        const pa = ta - ra;
+
+        setUpdatedOrder((prevValues) => ({
+            ...prevValues,
+            totalAmount: ta,
+            pendingAmount: pa,
+            receivedAmount: ra,
+        }));
+    }
+
+    const formatCustomerLedger = () => {
+        const { customer, totalAmount, pendingAmount, receivedAmount, paymentMethod } = updatedOrder;
+
+        const customerLedger = customer?.ledger || [];
+
+        customerLedger.push({
+            note: '',
+            totalAmount,
+            pendingAmount,
+            orderPK: null,
+            receivedAmount,
+            pk: generatePK(),
+            customerPK: customer?.pk,
+            paymentMethod: paymentMethod.name,
+            createdDate: new Date().toUTCString()
+        })
+
+        customer['ledger'] = customerLedger;
+
+        setUpdatedOrder((prevValues) => ({
+            ...prevValues,
+            customer,
+        }));
+    }
+
     console.log('pos :: order :: ', order);
     console.log('pos :: updatedOrder :: ', updatedOrder);
 
@@ -665,16 +756,37 @@ const AddOrder = () => {
     }, [update])
 
     return (
-        <Box m="20px">
+        <Box m="20px" mr="0">
             <Box m="10px">
                 <Header title={title} />
             </Box>
             <Box m="10px" ml="-10px">
-                <Box>
-                    <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
-                    <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>
-                    <Button {...editButton} onClick={source === 'add' ? handleAddOrder : handleUpdateOrder}>Save</Button>
-                </Box>
+                <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
+                <Button {...editButton} onClick={addNewItemInOrder}>Add new item</Button>
+                <Button {...editButton} onClick={source === 'add' ? handleAddOrder : handleUpdateOrder}>Save</Button>
+            </Box>
+            <Box m="10px">
+                <Header title={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
+            </Box>
+            <Box m="10px" display='flex' gap='10px'>
+                <Header subtitle={`Pending Amount: ${updatedOrder?.price?.length && updatedOrder?.quantity?.length ? updatedOrder?.pendingAmount?.toLocaleString() : '0'} PKR`} />
+            </Box>
+            <Box m="10px" display='flex' gap='9px'>
+                <Header subtitle={`Received Amount: ${totalBill === 0 ? '0 PKR' : ''}`} />
+                {
+                    updatedOrder?.price?.length > 0 && updatedOrder?.quantity?.length > 0 ?
+                        <TextField
+                            type="number"
+                            name="receivedAmount"
+                            value={updatedOrder?.receivedAmount}
+                            onChange={(e) => {
+                                const valueCheck = parseFloat(e.target.value);
+                                if (valueCheck > 0) handleAmounts(e);
+                            }}
+                        />
+                        :
+                        <></>
+                }
             </Box>
             <Box m="10px" textAlign="center">
                 <Header title={`Total Bill: ${totalBill.toLocaleString()} PKR`} />

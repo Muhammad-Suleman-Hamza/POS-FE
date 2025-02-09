@@ -171,13 +171,24 @@ const ViewOrder = () => {
 
     return (
         <Box m="20px" ref={printComponentRef}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title={`Order: ${id}`} subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
+            <Box m="10px">
+                <Header title={`Order: ${id}`} />
+            </Box>
+            <Box m="10px" ml="-5px">
                 <Box className="hide-on-print">
                     <Button {...backButton}><Link to={'/orders'} style={{ ...backButton.anchorsx }}>Back</Link></Button>
                     <Button {...editButton}><Link to={`/orders/update/${currentOrder?.pk}`} style={{ ...backButton.anchorsx }}>Edit</Link></Button>
                     <Button {...editButton} onClick={handleReactToPrintFn}>Print</Button>
                 </Box>
+            </Box>
+            <Box m="10px" mt="20px">
+                <Header subtitle={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
+            </Box>
+            <Box m="10px" display='flex' gap='10px'>
+                <Header subtitle={`Pending Amount: ${currentOrder?.pendingAmount ? currentOrder?.pendingAmount.toLocaleString() : '0'} PKR`} />
+            </Box>
+            <Box m="10px" display='flex' gap='9px'>
+                <Header subtitle={`Received Amount: ${currentOrder?.receivedAmount ? currentOrder?.receivedAmount.toLocaleString() : '0'} PKR`} />
             </Box>
             <Box
                 m="8px 0 0 0"
