@@ -20,6 +20,13 @@ import {
     Autocomplete
 } from "@mui/material";
 import {
+    Box,
+    useTheme,
+    MenuItem,
+    TextField,
+    Autocomplete
+} from "@mui/material";
+import {
     getLocalStorage,
     setSessionStorage,
     getSessionStorage,
@@ -780,6 +787,9 @@ const AddOrder = () => {
                         :
                         <></>
                 }
+            </Box>
+            <Box m="10px" textAlign="center">
+                <Header title={`Total Bill: ${totalBill.toLocaleString()} PKR`} />
             </Box>
             <Box
                 m="8px 0 0 0"
