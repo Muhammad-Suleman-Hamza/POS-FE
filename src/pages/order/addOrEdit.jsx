@@ -7,6 +7,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import BasicModal from "../../components/Modal";
+import { getItems } from "../../store/slices/item";
 import { useDispatch, useSelector } from "react-redux";
 import { paymentMethods } from "../../constants/generic";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -35,7 +36,6 @@ import {
     initialValuesOfCustomer,
     checkoutSchemaOfCustomer,
 } from '../../constants/FormFields'
-import { getItems } from "../../store/slices/item";
 
 const AddOrder = () => {
     const theme = useTheme();
