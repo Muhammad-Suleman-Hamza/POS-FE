@@ -13,25 +13,18 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { addOrder, updateOrder } from "../../store/slices/order";
 import { toggleCreateOrUpdateModal, toggleLoading } from "../../store/slices/common";
 import {
-    Box,
-    useTheme,
-    MenuItem,
-    TextField,
-    Autocomplete
-} from "@mui/material";
-import {
-    Box,
-    useTheme,
-    MenuItem,
-    TextField,
-    Autocomplete
-} from "@mui/material";
-import {
     getLocalStorage,
     setSessionStorage,
     getSessionStorage,
     removeSessionStorage,
 } from "../../helpers/storage";
+import {
+    Box,
+    useTheme,
+    MenuItem,
+    TextField,
+    Autocomplete
+} from "@mui/material";
 import {
     addButton,
     backButton,
